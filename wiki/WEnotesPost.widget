@@ -1,0 +1,16 @@
+<noinclude>A WEnotes post form.
+== Usage ==
+<nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|tag=wikieducator|button=Post it!|leftmargin=0}}</nowiki>
+
+== Parameters ==
+* '''tag''' - tag to follow (default: ''wikieducator'')
+* '''button''' - text for the submit button (default: ''Post a WEnote'')
+* '''leftmargin''' - left margin in pixels (default: aligns with WEnotes text from [[Widget:WEnotes]])
+
+</noinclude><includeonly>
+<!--{counter name="WEnotesPostID" assign ="WEnotesPostID"}-->
+<div id="WEnotesPost<!--{$WEnotesPostID|escape:'html'}-->"></div>
+<script type="text/javascript">/*<![CDATA[*/
+$.getScript('/extensions/WEnotes/WEnotesPost.js', function() {
+WEnotesPost("WEnotesPost<!--{$WEnotesPostID|validate:'int'}-->", '<!--{$tag|escape:'quotes'}-->', '<!--{$button|escape:'html'}-->', '<!--{$leftmargin|escape:'quotes'}-->');});
+/*]]>*/</script></includeonly>

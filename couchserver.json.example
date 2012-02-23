@@ -1,0 +1,6 @@
+{
+  "url": "http://user:pass@account.iriscouch.com:5984",
+  "db": "databasename",
+  "moodleuser": "username",
+  "moodlepass": "password"
+}

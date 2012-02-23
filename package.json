@@ -1,0 +1,22 @@
+{
+  "name": "WEnotes",
+  "description": "Harvest tweets, dents, moodle for WikiEducator",
+  "keywords": [
+    "WikiEducator"
+  ],
+  "version": "1.0.0",
+  "author": "Jim Tittsler <jim@OERfoundation.org>",
+  "repository": {
+    "type": "git",
+    "url": "https://git.gitorious.org/wikieducator/wenotes.git"
+  },
+  "dependencies": {
+    "couch-client": "0.0.4"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ]
+}
+
