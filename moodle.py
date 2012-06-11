@@ -46,14 +46,13 @@ if len(view) == 1:
 else:
     lasttime = "2000-01-01T00:00:00.000Z"
 
-feeds = ['http://moodle.wikieducator.org/rss/file.php/3126/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/123/rss.xml', # News Forum
-        'http://moodle.wikieducator.org/rss/file.php/3127/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/124/rss.xml', # Introduce
-        'http://moodle.wikieducator.org/rss/file.php/3129/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/126/rss.xml', # Open
-        'http://moodle.wikieducator.org/rss/file.php/3132/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/127/rss.xml', # Getting to know you
-        'http://moodle.wikieducator.org/rss/file.php/3140/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/128/rss.xml', # Barriers
-        'http://moodle.wikieducator.org/rss/file.php/3154/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/129/rss.xml', # Case study
-        'http://moodle.wikieducator.org/rss/file.php/3171/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/130/rss.xml', # NC or not to NC
-        'http://moodle.wikieducator.org/rss/file.php/4343/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/132/rss.xml' # survey results
+feeds = ['http://moodle.wikieducator.org/rss/file.php/4733/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/146/rss.xml', # News Forum
+        'http://moodle.wikieducator.org/rss/file.php/4734/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/147/rss.xml', # Introduce
+        'http://moodle.wikieducator.org/rss/file.php/4735/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/148/rss.xml', # Open
+        'http://moodle.wikieducator.org/rss/file.php/4742/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/150/rss.xml', # Getting to know you
+        'http://moodle.wikieducator.org/rss/file.php/4750/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/151/rss.xml', # Barriers
+        'http://moodle.wikieducator.org/rss/file.php/4765/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/152/rss.xml', # Case study
+        'http://moodle.wikieducator.org/rss/file.php/4783/5e63bb7b7687d7273662e7a773fe7f3a/mod_forum/153/rss.xml' # NC or not to NC
         ]
 
 cj = cookielib.CookieJar()
