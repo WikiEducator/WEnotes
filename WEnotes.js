@@ -41,6 +41,7 @@
       timeLink = 'http://identi.ca/notice/' + d.id;
       break;
     case 'moodle':
+    case 'ask':
       timeLink = d.we_link;
       break;
     }
@@ -96,7 +97,7 @@
     msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
     var profileURLprefix = (d.we_source === "twitter") ? 'http://twitter.com/' : 'http://WikiEducator.org/User:';
     var profileURL;
-    if (d.we_source === 'moodle') {
+    if ((d.we_source === 'moodle') || (d.we_source === 'ask')) {
       profileURL = d.profile_url;
     } else {
       profileURL = user.statusnet_profile_url || profileURLprefix + user;
@@ -126,7 +127,7 @@
     var userName = user.screen_name || user;
     var userFullname = user.name || d.from_user_name;
     msg += '<a href="' + profileURL + '" style="text-decoration: none;"><b>' + userName + '</b></a>&nbsp;&nbsp;<span style="color:#999;">' + userFullname + '</span><br />';
-    if ((d.we_source === 'moodle') && d.truncated) {
+    if (((d.we_source === 'moodle') || (d.we_source ==='ask')) && d.truncated) {
       text = text.substring(0, text.lastIndexOf('...')) + '<a class="external text" href="' + d.we_link + '">...</a>';
     }
     msg += text;
