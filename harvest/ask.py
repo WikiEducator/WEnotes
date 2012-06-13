@@ -30,11 +30,13 @@ import feedparser
 import sys
 import json
 import hashlib
+import HTMLParser
 
 # retrieve URL including authentication credentials from config JSON
 couchserver = json.load(open('couchserver.json', 'rt'))
 couch = couchdb.Server(couchserver['url'])
 db = couch[couchserver['db']]
+h = HTMLParser.HTMLParser()
 
 # get the last time for a moodle post in the database
 view = db.view('ids/ask', descending=True, limit=1)
@@ -50,15 +52,28 @@ def gravatar(e):
     return 'http://www.gravatar.com/avatar/' + \
             hashlib.md5(e.strip().lower()).hexdigest() + '?s=48'
 
-feeds = ['http://ask.oeruniversity.org/feeds/atom/?tags=ocl4ed']
+feed = 'http://ask.oeruniversity.org/feeds/atom/?tags=ocl4ed'
+qfeed = 'http://ask.oeruniversity.org/feeds/questiona/%s/'
+qpattern = re.compile(r'http://ask.OERuniversity.org/question/(?P<q>\d+)')
 
-feedno = 98 # avoid conflicts with Moodle feeds
-for feed in feeds:
-    rss = feedparser.parse(feed)
+# find all of the questions
+rss = feedparser.parse(feed)
+qitems = rss['items']
+qitems.reverse()
+
+qs = []
+for qitem in qitems:
+    mo = qpattern.match(qitem['link'])
+    if mo:
+        qs.append(mo.group('q'))
+print qs
+
+# for each of the questions, find the new questions, answers, comments
+for q in qs:
+    rss = feedparser.parse(qfeed % q)
     feedtitle = rss['channel']['title']
 
     items = rss['items']
-    items.reverse()
 
     for item in items:
         if item['title'] == 'RSS Error' and item['description'] == 'Error reading RSS data':
@@ -76,7 +91,11 @@ for feed in feeds:
         # strip out HTML markup before abridging, so we don't stop midtag
         body = item['title'] + ' ' + item['summary']
         abridged = re.sub(r'<[^>]*>', '', body)
-        abridged = re.sub(r'\s*by [^.]+\.\n?', '', abridged)
+        abridged = h.unescape(abridged)
+        #abridged = re.sub(r'\s*by [^.]+\.\n?', '', abridged)
+        abridged = re.sub(r'\s+', ' ', abridged)
+        abridged = re.sub(r'(Comment|Answer) by (.*?) for', r'\1 for',
+                abridged, 1)
         abridged = abridged[:500].strip()
         abridged = abridged.replace('&nbsp;', ' ')
         abridged = abridged.replace('\n', ' ')
@@ -89,10 +108,13 @@ for feed in feeds:
             truncated = True
 
         author = item['author_detail']['name']
-        profile_url = ''
 
         print item
-        print '----'
+        print '----',q
+        print item['title']
+        print '++'
+        print item['summary']
+        print '++'
 
         mention = {
                 'from_user': author,
@@ -102,8 +124,8 @@ for feed in feeds:
                     gravatar(item['author_detail']['email']),
                 'text': abridged,
                 'truncated': truncated,
-                'id': '%d%02d' % (seconds, feedno),
-                'profile_url': profile_url,
+                'id': '%d%05d' % (seconds, int(q)),
+                'profile_url': item['author_detail']['href'],
                 'we_source': 'ask',
                 'we_feed': feedtitle,
                 'we_tag': 'ocl4ed',
@@ -114,5 +136,4 @@ for feed in feeds:
         print '==========='
         continue
         db.save(mention)
-    feedno += 1
 
