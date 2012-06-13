@@ -18,7 +18,7 @@ $wgExtensionCredits['parserhook'][] = array(
 	'version'        => '0.1',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
-        'description'    => 'add API calls for posting a WEnotes microblog',
+        'description'    => 'add API calls for posting to a WEnotes microblog',
 );
 
 $wgAPIModules['wenotes'] = 'APIWEnotes';
