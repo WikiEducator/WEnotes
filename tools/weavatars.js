@@ -8,59 +8,6 @@ var couchserver = JSON.parse(fs.readFileSync('couchserver.json', 'utf8'));
 var mentionsdb = couch(couchserver['url'] + '/' + couchserver['db']),
     weavatarsdb = couch('http://wikieducator.iriscouch.com:5984/weavatars');
 
-function getTweets(sinceID) {
-  var i, query, body,
-      regexps = [],
-      options = {};
-
-  for (i=0; i<tags.length; i++) {
-    regexps[i] = new RegExp(tags[i], "i");
-  }
-  query = encodeURIComponent(tags.join(' OR '));
-
-  options = {
-  host: 'api.twitter.com',
-  port: 80,
-  path: '/search.json?q=' + query + '&include_entities=true&since_id=' + sinceID
-};
-
-  http.get(options, function(res) {
-    body = '';
-    var status = res.statusCode;
-    var headers = JSON.stringify(res.headers);
-    res.on('data', function(chunk) {
-      body += chunk;
-    });
-    res.on('end', function() {
-      try {
-        var r = JSON.parse(body);
-      } catch(err) {
-        console.log('*** Unable to parse body', err);
-        console.log(status);
-        console.log(headers);
-        console.log(body);
-        throw(err);
-      }
-      if (r.results) {
-        var l = r.results.length - 1;
-        while (l >= 0) {
-          var d = new Date(r.results[l].created_at);
-          r.results[l].we_timestamp = JSON.stringify(d).replace(/"/g, '');
-          r.results[l].we_source = 'twitter';
-          for (i=0; i<tags.length; i++) {
-            if(regexps[i].test(r.results[l].text)) {
-              r.results[l].we_tag = tags[i].substring(1);
-              mentionsdb.save(r.results[l], function() {
-              });
-            }
-          }
-          l -= 1;
-        }
-      }
-    });
-  });
-}
-
 var lookups = 0,
     weusers = {},
     userpages = [];
@@ -75,7 +22,9 @@ function checkUserpages() {
     action: 'query',
     format: 'json',
     prop: 'revisions',
-    rvprop: 'content',
+    rvprop: 'content'
+    //prop: 'images',
+    //imlimit: 500,
   };
   var i, qs;
 
