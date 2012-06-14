@@ -92,8 +92,10 @@ for q in qs:
         body = item['title'] + ' ' + item['summary']
         abridged = re.sub(r'<[^>]*>', '', body)
         abridged = h.unescape(abridged)
-        #abridged = re.sub(r'\s*by [^.]+\.\n?', '', abridged)
+        # remove square brackets (link anchors)
+        abridged = re.sub(r'\[|]', ' ', abridged)
         abridged = re.sub(r'\s+', ' ', abridged)
+        # remove inline attribution, already have author
         abridged = re.sub(r'(Comment|Answer) by (.*?) for', r'\1 for',
                 abridged, 1)
         abridged = abridged[:500].strip()
@@ -134,5 +136,4 @@ for q in qs:
                 }
         print mention
         print '==========='
-        continue
         db.save(mention)
