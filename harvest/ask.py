@@ -46,8 +46,6 @@ if len(view) == 1:
 else:
     lasttime = "2000-01-01T00:00:00.000Z"
 
-print "lasttime", lasttime
-
 def gravatar(e):
     return 'http://www.gravatar.com/avatar/' + \
             hashlib.md5(e.strip().lower()).hexdigest() + '?s=48&d=identicon&r=pg'
@@ -66,7 +64,6 @@ for qitem in qitems:
     mo = qpattern.match(qitem['link'])
     if mo:
         qs.append(mo.group('q'))
-print qs
 
 # for each of the questions, find the new questions, answers, comments
 for q in qs:
@@ -79,11 +76,7 @@ for q in qs:
         if item['title'] == 'RSS Error' and item['description'] == 'Error reading RSS data':
             break
         truncated = False
-        print item['date']
-        #try:
         dt = datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%S+00:00')
-        #except ValueError:
-        #    dt = datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%S+00:00')
         we_timestamp = dt.strftime('%Y-%m-%dT%H:%M:%S.000Z')
         if we_timestamp <= lasttime:
             continue
@@ -110,13 +103,6 @@ for q in qs:
             truncated = True
 
         author = item['author_detail']['name']
-
-        print item
-        print '----',q
-        print item['title']
-        print '++'
-        print item['summary']
-        print '++'
 
         mention = {
                 'from_user': author,
