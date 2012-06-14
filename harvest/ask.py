@@ -50,7 +50,7 @@ print "lasttime", lasttime
 
 def gravatar(e):
     return 'http://www.gravatar.com/avatar/' + \
-            hashlib.md5(e.strip().lower()).hexdigest() + '?s=48'
+            hashlib.md5(e.strip().lower()).hexdigest() + '?s=48&d=identicon&r=pg'
 
 feed = 'http://ask.oeruniversity.org/feeds/atom/?tags=ocl4ed'
 qfeed = 'http://ask.oeruniversity.org/feeds/questiona/%s/'
