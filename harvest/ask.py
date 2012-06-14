@@ -127,7 +127,7 @@ for q in qs:
                 'id': '%d%05d' % (seconds, int(q)),
                 'profile_url': item['author_detail']['href'],
                 'we_source': 'ask',
-                'we_feed': feedtitle,
+                'we_feed': '%s: %d' % (feedtitle, int(q)),
                 'we_tag': 'ocl4ed',
                 'we_timestamp': we_timestamp,
                 'we_link': item['link']
@@ -136,4 +136,3 @@ for q in qs:
         print '==========='
         continue
         db.save(mention)
-
