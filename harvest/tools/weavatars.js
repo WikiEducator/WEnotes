@@ -6,42 +6,124 @@ var fs = require('fs'),
 
 var couchserver = JSON.parse(fs.readFileSync('couchserver.json', 'utf8'));
 var mentionsdb = couch(couchserver['url'] + '/' + couchserver['db']),
-    weavatarsdb = couch('http://wikieducator.iriscouch.com:5984/weavatars');
+    weavatarsdb = couch(couchserver['url'] + '/weavatars');
+var weAPI = 'http://WikiEducator.org/api.php';
+var host = 'wikieducator.org';
 
 var lookups = 0,
     weusers = {},
-    userpages = [];
+    userpages = [],
+    files = [],
+    avatars = [];
+
+function queryString(args, titles) {
+  var i;
+  var qs = [], t = [];
+  for (i=0; i<titles.length; i++) {
+    t[i] = encodeURIComponent(titles[i]);
+  }
+  args.titles = t.join('|');
+  for (i in args) {
+    qs.push(i + '=' + args[i]);
+  }
+  return qs.join('&');
+}
+
+function fetchAvatars() {
+  var i;
+  console.log('fetchAvatars: files=', files);
+  if (files.length === 0) {
+    return;
+  }
+
+  var args = {
+    action: 'query',
+    format: 'json',
+    prop: 'imageinfo',
+    iiprop: 'url',
+    iiurlwidth: '48',
+    iiurlheight: '48'
+  }
+  var options = {
+    host: host,
+    port: 80,
+    path: '/api.php?' + queryString(args, files)
+  };
+
+  http.get(options, function(res) {
+    var body = '';
+    res.on('data', function(chunk) {
+      body += chunk;
+    });
+    res.on('end', function() {
+      try {
+        var r = JSON.parse(body);
+      } catch(err) {
+        console.log('*** Unable to parse API result', err);
+        console.log(status);
+        console.log(headers);
+        throw(err);
+      }
+      if (r && r.query && r.query.normalized) {
+        var norm;
+        var norms = r.query.normalized;
+        for (norm in norms) {
+          for (i=0; i<avatars.length; i++) {
+            if (avatars[i].file === norms[norm].from) {
+              avatars[i].file = norms[norm].to;
+              break;
+            }
+          }
+        }
+      }
+      if (r && r.query && r.query.pages) {
+        var page;
+        var pages = r.query.pages;
+        for (page in pages) {
+          for (i=0; i<avatars.length; i++) {
+            if (avatars[i].file === pages[page].title) {
+              avatars[i].url = pages[page].imageinfo[0].thumburl;
+              avatars[i].file = avatars[i].file.substring(5);
+              break;
+            }
+          }
+        }
+      }
+      console.log('save avatars', avatars);
+      for (i=0; i<avatars.length; i++) {
+        if (avatars[i].url && avatars[i].file) {
+          weavatarsdb.save(avatars[i], function(err, doc) {
+            if (err) {
+              console.log('***** error saving', avatars[i]);
+              console.log(err);
+              throw(err);
+            }
+            console.log('saved: ', doc);
+          });
+        } else {
+          console.log('***** missing url and/or file:', avatars[i]);
+        }
+      }
+    });
+  });
+}
 
 function checkUserpages() {
+  var i;
   if (userpages.length === 0) {
     return;
   }
 
-  var weAPI = 'http://WikiEducator.org/api.php';
   var args = {
     action: 'query',
     format: 'json',
     prop: 'revisions',
     rvprop: 'content'
-    //prop: 'images',
-    //imlimit: 500,
   };
-  var i, qs;
-
-  for (i=0; i<userpages.length; i++) {
-    userpages[i] = encodeURIComponent(userpages[i]);
-  }
-  args.titles = userpages.join('|');
-
-  qs = [];
-  for (i in args) {
-    qs.push(i + '=' + args[i]);
-  }
-
   var options = {
     host: 'WikiEducator.org',
     port: 80,
-    path: '/api.php?' + qs.join('&')
+    path: '/api.php?' + queryString(args, userpages)
   };
 
   http.get(options, function(res) {
@@ -63,9 +145,30 @@ function checkUserpages() {
       var pages = r.query.pages;
       for (pg in pages) {
         if (pg >= 0) {
-          console.log(pg, pages[pg]);
+          var page = pages[pg];
+          var content = '';
+          if (page.revisions && page.revisions[0]) {
+            content = page.revisions[0]['*'];
+          }
+          var photom = /\|\s*photo\s*=\s*\[\[([^\]|\u200e]+)/i.exec(content);
+          var photo = photom ? photom[1] : '';
+          console.log(page.title, photo);
+          var stockm = /(file|image):wikieducator_logo100.jpg/i.exec(photo);
+          if (stockm) {
+            console.log('WE logo, skipping');
+            console.log('============');
+            continue;
+          }
+          if (photo) {
+            files.push(photo.replace(/^\s+|\s+$/g, ''));
+            avatars.push({
+              _id: page.title.substring(5),
+              file: photo.replace(/^\s+|\s+$/g)});
+          }
+          console.log('============');
         }
       }
+      fetchAvatars();
     })
   });
 }
