@@ -292,6 +292,7 @@ if ( !Date.prototype.toISOString ) {
           msg += '<div style="float: left; width: 48px; height: 48px;"><a href="' + profileURL + '"><img src="' + profileIMG + '" border=0 style="float: right;"></a></div><div style="margin-left: 53px;">';
         } else {
           // cached a "don't know" value for the thumbnail
+          profileIMG = '/extensions/WEnotes/missing.gif';
           //debug.log('need thumbnail for ' + d.from_user + ': ' + weavatars[d.from_user].file);
           msg += '<div style="float: left; width: 48px; height: 48px;"><a href="' + profileURL + '"><img class="' + d.from_user.replace(/ /g, '_') + '" src="' + profileIMG + '" border=0 style="float: right;"></a></div><div style="margin-left: 53px;">';
         }
@@ -299,6 +300,7 @@ if ( !Date.prototype.toISOString ) {
         if ($.inArray(d.from_user, thumbnailsNeeded) === -1) {
           thumbnailsNeeded.push(d.from_user);
         }
+        profileIMG = '/extensions/WEnotes/missing.gif';
         msg += '<div style="float: left; width: 48px; height: 48px;"><a href="' + profileURL + '"><img class="' + d.from_user.replace(/ /g, '_') + '" src="' + profileIMG + '" border=0 style="float: right;"></a></div><div style="margin-left: 53px;">';
       }
     } else {
