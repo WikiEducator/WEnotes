@@ -33,6 +33,9 @@ function fetchAvatars() {
   var i;
   console.log('fetchAvatars: files=', files);
   if (files.length === 0) {
+    if (userpages.length) {
+      process.nextTick(checkUserpages);
+    }
     return;
   }
 
@@ -104,6 +107,9 @@ function fetchAvatars() {
           console.log('***** missing url and/or file:', avatars[i]);
         }
       }
+      if (userpages.length) {
+        process.nextTick(checkUserpages);
+      }
     });
   });
 }
@@ -114,6 +120,8 @@ function checkUserpages() {
     return;
   }
 
+  // limit number queried in a single Mediawiki API request
+  var todo = (userpages.length > 50) ? 50 : userpages.length;
   var args = {
     action: 'query',
     format: 'json',
@@ -123,7 +131,7 @@ function checkUserpages() {
   var options = {
     host: 'WikiEducator.org',
     port: 80,
-    path: '/api.php?' + queryString(args, userpages)
+    path: '/api.php?' + queryString(args, userpages.splice(0, todo))
   };
 
   http.get(options, function(res) {
