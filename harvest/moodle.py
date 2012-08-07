@@ -34,9 +34,9 @@ import sys
 import json
 
 # retrieve URL including authentication credentials from config JSON
-couchserver = json.load(open('couchserver.json', 'rt'))
-couch = couchdb.Server(couchserver['url'])
-db = couch[couchserver['db']]
+options = json.load(open('options.json', 'rt'))
+couch = couchdb.Server(options['url'])
+db = couch[options['db']]
 
 # get the last time for a moodle post in the database
 view = db.view('ids/moodle', descending=True, limit=1)
@@ -57,8 +57,8 @@ feeds = ['http://moodle.wikieducator.org/rss/file.php/4733/5e63bb7b7687d7273662e
 
 cj = cookielib.CookieJar()
 moodle = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-data = urllib.urlencode({'username': couchserver['moodleuser'],
-                        'password': couchserver['moodlepass']})
+data = urllib.urlencode({'username': options['moodleuser'],
+                        'password': options['moodlepass']})
 
 li = moodle.open('http://moodle.wikieducator.org/login/index.php', data)
 

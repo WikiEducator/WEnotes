@@ -27,9 +27,9 @@ import hashlib
 import json
 
 # retrieve URL including authentication credentials from config JSON
-couchserver = json.load(open('couchserver.json', 'rt'))
-couch = couchdb.Server(couchserver['url'])
-db = couch[couchserver['db'])
+options = json.load(open('options.json', 'rt'))
+couch = couchdb.Server(options['url'])
+db = couch[options['db'])
 
 for id in db:
     doc = db[id]

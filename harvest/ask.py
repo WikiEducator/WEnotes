@@ -33,9 +33,9 @@ import hashlib
 import HTMLParser
 
 # retrieve URL including authentication credentials from config JSON
-couchserver = json.load(open('couchserver.json', 'rt'))
-couch = couchdb.Server(couchserver['url'])
-db = couch[couchserver['db']]
+options = json.load(open('options.json', 'rt'))
+couch = couchdb.Server(options['url'])
+db = couch[options['db']]
 h = HTMLParser.HTMLParser()
 
 # get the last time for a moodle post in the database

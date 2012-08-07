@@ -3,4 +3,5 @@
   "db": "databasename",
   "moodleuser": "username",
   "moodlepass": "password"
+  "tags": ["wikieducator", "ocl4ed", "oeru", "ast1000"]
 }

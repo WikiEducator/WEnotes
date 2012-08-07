@@ -2,10 +2,14 @@ var fs = require('fs'),
     http = require('http'),
     couch = require('couch-client');
 
-var tags = ['#wikieducator', '#ocl4ed', '#oeru'];
-
-var couchserver = JSON.parse(fs.readFileSync('couchserver.json', 'utf8'));
-var mentionsdb = couch(couchserver['url'] + '/' + couchserver['db']);
+var options = JSON.parse(fs.readFileSync('options.json', 'utf8'));
+var mentionsdb = couch(options['url'] + '/' + options['db']);
+var tags = options['tags'];
+var ix;
+var tagslen = tags.length;
+for (i=0; i<tagslen; i++) {
+  tags[i] = '#' + tags[i];
+}
 
 function getTweets(sinceID) {
   var i, query, body,

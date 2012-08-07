@@ -9,8 +9,8 @@ var fs = require('fs'),
     http = require('http'),
     couch = require('couch-client');
 
-var couchserver = JSON.parse(fs.readFileSync('couchserver.json', 'utf8'));
-var mentionsdb = couch(couchserver['url'] + '/' + couchserver['db']);
+var options = JSON.parse(fs.readFileSync('options.json', 'utf8'));
+var mentionsdb = couch(options['url'] + '/' + options['db']);
 
 var lookups = 0,
     weusers = {},
