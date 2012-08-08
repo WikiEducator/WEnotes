@@ -1,8 +1,8 @@
 var fs = require('fs'),
     http = require('http'),
-    couch = require('couch-client');
+    couch = require('couch-client'),
+    options = require('./options.json');
 
-var options = JSON.parse(fs.readFileSync('options.json', 'utf8'));
 var mentionsdb = couch(options['url'] + '/' + options['db']);
 var tags = options['tags'];
 var ix;
