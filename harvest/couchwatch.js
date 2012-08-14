@@ -1,3 +1,10 @@
+/*
+ * watch the CouchDB mentions database for changes
+ * and publish them on the correct Faye channel
+ *
+ * Copyright 2012 Open Education Resources Foundation
+ * @license MIT
+ */
 "use strict";
 
 var cradle  = require('cradle'),
@@ -22,9 +29,6 @@ var client = new faye.Client('http://live.oer.me/faye');
 client.addExtension(ClientAuth);
 
 var db = new(cradle.Connection)(options.url).database(options.db);
-
-//var u = url.parse(options.url);
-//console.log(u);
 
 var feed = db.changes({
   since: 'now',
