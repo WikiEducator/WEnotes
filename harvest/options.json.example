@@ -1,7 +1,0 @@
-{
-  "url": "http://user:pass@account.iriscouch.com:5984",
-  "db": "databasename",
-  "moodleuser": "username",
-  "moodlepass": "password"
-  "tags": ["wikieducator", "ocl4ed", "oeru", "ast1000"]
-}
