@@ -15,7 +15,7 @@ require_once('sag/src/Sag.php');
 
 $wgExtensionCredits['parserhook'][] = array(
 	'name'           => 'WEnotes',
-	'version'        => '0.1',
+	'version'        => '0.2',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -30,7 +30,8 @@ class APIWEnotes extends ApiQueryBase {
 
 	public function execute() {
 		global $wgUser, $wgServer;
-		global $wgWEnotesHost, $wgWEnotesPort, $wgWEnotesDB;
+		global $wgWEnotesHost, $wgWEnotesPort;
+		global $wgWEnotesDB, $wgWEnotesAvatarsDB;
 		global $wgWEnotesUser, $wgWEnotesPasswd, $wgWEnotesTags;
 		$user = $wgUser->getId();
 		$params = $this->extractRequestParams();
@@ -58,6 +59,14 @@ class APIWEnotes extends ApiQueryBase {
 		}
 
 		$sag = new Sag($wgWEnotesHost, $wgWEnotesPort);
+		$sag->setDatabase($wgWEnotesAvatarsDB);
+		try {
+			$imgurl = $sag->get(urlencode($wgUser->getName()))->body->url;
+		} catch(Exception $e) {
+			error_log('Unable to get avatar for ' .
+				$wgUser->getName());
+			$imgurl = '';
+		}
 		$sag->setDatabase($wgWEnotesDB);
 		$sag->login($wgWEnotesUser, $wgWEnotesPasswd);
 		list($usec, $ts) = explode(' ', microtime());
@@ -65,7 +74,7 @@ class APIWEnotes extends ApiQueryBase {
 			'from_user' => $wgUser->getName(),
 			'from_user_name' => $wgUser->getRealName(),
 			'created_at' => date('r', $ts),
-			'profile_image_url' => '',
+			'profile_image_url' => $imgurl,
 			'text' => $params['text'],
 			'id' => $ts . substr("00000$usec", 0, 6),
 			'profile_url' => $wgServer. '/User:' . $wgUser->getTitleKey(),
