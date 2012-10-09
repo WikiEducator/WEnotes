@@ -18,6 +18,6 @@ sag*
 # don't include the configuration file
 options.json
 # don't track our build output
-WEnotes-client.js
+WEnotesClient.js
 WEnotes-min.js
 

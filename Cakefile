@@ -8,7 +8,7 @@ files = [
 contents = []
 
 task 'min', 'build minified WEnotes client', (options) ->
-  fs.readFile "WEnotes-client.js", 'utf8', (err, code) ->
+  fs.readFile "WEnotesClient.js", 'utf8', (err, code) ->
     util.log err if err
     try
       util.log "creating WEnotes-min.js"
@@ -29,7 +29,7 @@ task 'build', 'build WEnotes client', (options) ->
 
 process = ->
   code = contents.join "\n\n"
-  fs.writeFile "WEnotes-client.js", code, (err, data) ->
+  fs.writeFile "WEnotesClient.js", code, (err, data) ->
     util.log err if err
     invoke 'min'
 
