@@ -136,8 +136,10 @@ if ( !Date.prototype.toISOString ) {
     }
 
     msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
-    if (d.we_source === 'wikieducator') {
-      //debug.log('weavatars', weavatars);
+    console.log('source', source);
+    if (source === 'xwikieducator') {
+      console.log('weavatars', weavatars);
+      console.log('from_user:', d.from_user, 'profileIMG:', profileIMG);
       if (d.from_user in weavatars) {
         if (weavatars[d.from_user].url) {
           //debug.log('have an avatar for ' + d.from_user + ': ' +
@@ -208,6 +210,7 @@ if ( !Date.prototype.toISOString ) {
     return optionList.join('&');
   }
 
+  /*
   function getThumbnails() {
     var couchURL = couchHost + 'weavatars/_all_docs?',
         options = {
@@ -239,6 +242,7 @@ if ( !Date.prototype.toISOString ) {
       }
     });
   }
+  */
 
   function getMore(event) {
     //debug.log('getMore', event.data.ix);
@@ -292,9 +296,11 @@ if ( !Date.prototype.toISOString ) {
             $('#WEitf'+id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
+          /*
           if (thumbnailsNeeded.length) {
             getThumbnails();
           }
+          */
           $wenmdi.css('visibility', 'hidden');
           $wenm.css('visibility', 'visible');
           wendivs[ix].moreCount += 20;
@@ -376,14 +382,20 @@ if ( !Date.prototype.toISOString ) {
             $(did + ' > div:last').remove();
           }
           */
+          /*
           if (thumbnailsNeeded.length) {
             getThumbnails();
           }
+          */
 
           dx.timer = setTimeout(function() {$('div.WEnotes:first')
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         }
     });
+  }
+
+  function newPost(message, i) {
+    console.log('new message for div', i, message);
   }
 
   function WEnotesHandler(event, tag) {
@@ -397,14 +409,28 @@ if ( !Date.prototype.toISOString ) {
     });
   }
 
-  //debug.log('WENotes!');
+  console.log('WENotes!');
+  // only create one Faye client per page
+  if (!window.hasOwnProperty('WEFclient')) {
+    console.log("creating new Faye client");
+    window.WEFclient = new Faye.Client('http://live.oer.me:80/faye', {
+      timeout: 120
+    });
+  }
+  console.log('have Faye client');
+  var client = window.WEFclient;
+  var subs = [];
   $('div.WEnotes').each(function(i) {
     var $thisd = $(this);
     var classes = $(this).attr('class').split(/\s+/);
     $.each(classes, function(i, v) {
+      console.log("each classes", i);
       if (v.indexOf('WEnotes-') === 0) {
+        var tag, message;
         var args = v.split('-', 3);
+        console.log('args=', args);
         if (args.length === 3) {
+          tag = args[2];
           wendivs.push({
             $d: $thisd,
             count: args[1],
@@ -412,6 +438,13 @@ if ( !Date.prototype.toISOString ) {
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
             moreCount: 20
+          });
+          console.log(i, tag, wendivs[i-1]);
+          console.log('attempt to subscribe', '/WEnotes/' + tag);
+          subs[i] = client.subscribe('/WEnotes/' + tag, newPost);
+          console.log('back from subscribe call');
+          subs[i].callback(function() {
+            console.log("subscription active", '/wenotes/' + tag);
           });
         }
       }
