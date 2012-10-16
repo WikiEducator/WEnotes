@@ -15,7 +15,7 @@ require_once('sag/src/Sag.php');
 
 $wgExtensionCredits['parserhook'][] = array(
 	'name'           => 'WEnotes',
-	'version'        => '0.2',
+	'version'        => '0.3',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -61,10 +61,11 @@ class APIWEnotes extends ApiQueryBase {
 		$sag = new Sag($wgWEnotesHost, $wgWEnotesPort);
 		$sag->setDatabase($wgWEnotesAvatarsDB);
 		try {
-			$imgurl = $sag->get(urlencode($wgUser->getName()))->body->url;
+			$userName = urlencode($wgUser->getName());
+			$imgurl = $sag->get($userName)->body->url;
 		} catch(Exception $e) {
-			error_log('Unable to get avatar for ' .
-				$wgUser->getName());
+			error_log('Error: ' . $e->getCode() .
+				" unable to get avatar for $userName");
 			$imgurl = '';
 		}
 		$sag->setDatabase($wgWEnotesDB);
