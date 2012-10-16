@@ -46,32 +46,20 @@ if ( !Date.prototype.toISOString ) {
     var msg;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var serverProfile = {
+    var sourceProfile = {
       twitter: 'http://twitter.com/',
       identica: 'http://identi.ca/',
       wikieducator: 'http://WikiEducator.org/User:'
     };
-    var serverTag = {
+    var sourceTag = {
       twitter: 'http://twitter.com/#!/search?q=%23',
       identica: 'http://identi.ca/tag/',
       wikieducator: 'http://WikiEducator.org/'
     };
     var id = d.id;
     var user = d.user || d.from_user;
-    var server = d.we_source;
-    var timeLink = '#';
-    switch (server) {
-    case 'twitter':
-      timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
-      break;
-    case 'identica':
-      timeLink = 'http://identi.ca/notice/' + d.id;
-      break;
-    case 'moodle':
-    case 'ask':
-      timeLink = d.we_link;
-      break;
-    }
+    var source = d.we_source;
+
     // This text markup routine derived from one
     // Copyright Kent Brewster 2008  CC-BY-SA-3
     // see http://kentbrewster.com/identica-badge for info
@@ -86,7 +74,7 @@ if ( !Date.prototype.toISOString ) {
 
         if (word) {
           // special case for WikiEducator user names
-          if ((type === '@') && (server === 'wikieducator')) {
+          if ((type === '@') && (source === 'wikieducator')) {
             moniker = word;
           } else {
             moniker = word.split('_'); // behaviour with underscores differs
@@ -99,12 +87,12 @@ if ( !Date.prototype.toISOString ) {
           case 'http://': case 'https://': // html links
             href = scheme + '://' + url; break;
           case '@': // link users
-            href = serverProfile[server] + moniker; break;
+            href = sourceProfile[source] + moniker; break;
           case '!': // link groups
             href = 'http://identi.ca/group/' + moniker;
             break;
           case '#': // link tags
-            href = serverTag[server] + moniker;
+            href = sourceTag[source] + moniker;
             break;
         }
         if (scheme) { // only urls will have scheme
@@ -113,25 +101,41 @@ if ( !Date.prototype.toISOString ) {
           label = word; prefix = type;
         }
         // only identica has groups
-        if ((type === '!') && (server !== 'identica')) {
+        if ((type === '!') && (source !== 'identica')) {
           return label;
         }
         return prefix+'<a href="' + href + '" target="_identica">' + label + '</a>';
       });
 
-    if (server === 'identica') {
+    var timeLink = '#';
+    var profileURL = d.profile_url || '#';
+    var profileIMG = user.profile_image_url || d.profile_image_url ||
+        '/extensions/WEnotes/missing.gif';
+
+    switch (source) {
+    case 'wikieducator':
+      profileURL = 'http://WikiEducator.org/User:' + user;
+      break;
+    case 'twitter':
+      timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
+      profileURL = 'http://twitter.com/' + user;
+      break;
+    case 'identica':
+      timeLink = 'http://identi.ca/notice/' + d.id;
       text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
+      profileURL = user.statusnet_profile_url;
+      break;
+    case 'moodle':
+    case 'ask':
+      timeLink = d.we_link;
+      if (d.truncated) {
+        text = text.substring(0, text.lastIndexOf('...')) +
+          '<a class="external text" href="' + d.we_link + '">...</a>';
+      }
+      break;
     }
+
     msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
-    var profileURLprefix = (d.we_source === "twitter") ?
-      'http://twitter.com/' : 'http://WikiEducator.org/User:';
-    var profileURL;
-    if ((d.we_source === 'moodle') || (d.we_source === 'ask')) {
-      profileURL = d.profile_url;
-    } else {
-      profileURL = user.statusnet_profile_url || profileURLprefix + user;
-    }
-    var profileIMG = user.profile_image_url || d.profile_image_url;
     if (d.we_source === 'wikieducator') {
       //debug.log('weavatars', weavatars);
       if (d.from_user in weavatars) {
@@ -175,10 +179,6 @@ if ( !Date.prototype.toISOString ) {
     msg += '<a href="' + profileURL + '" style="text-decoration: none;"><b>' +
       userName + '</b></a>&nbsp;&nbsp;<span style="color:#999;">' +
       userFullname + '</span><br />';
-    if (((d.we_source === 'moodle') || (d.we_source ==='ask')) && d.truncated) {
-      text = text.substring(0, text.lastIndexOf('...')) +
-        '<a class="external text" href="' + d.we_link + '">...</a>';
-    }
     msg += text;
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
