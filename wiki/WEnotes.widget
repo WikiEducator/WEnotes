@@ -1,5 +1,5 @@
-<noinclude>A social media feed from [http://identi.ca/ identi.ca], [http://twitter.com/ Twitter], and
-[http://WikiEducator.org/ WikiEducator].
+<noinclude>An aggregated miniblog feed from [http://WikiEducator.org/WEnotes WikiEducator], [http://identi.ca/ identi.ca], [http://twitter.com/ Twitter], [http://moodle.wikieducator.org/ Moodle], and [http://ask.OERuniversity.org/ AskBot].
+
 == Usage ==
 <nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|tag=wikieducator|count=20}}</nowiki>
 
@@ -16,7 +16,7 @@ The feed is inserted into a named <nowiki><DIV></nowiki> on the page, allowing a
 $(function() {
   if (!window.WEnotes) {
     window.WEnotes = true;
-    $.getScript('/extensions/WEnotes/WEnotes.js');
+    $.getScript('/extensions/WEnotes/WEnotes-min.js');
   }
 })/*]]>*/</script>
 </includeonly>
