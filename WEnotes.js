@@ -178,9 +178,9 @@ if ( !Date.prototype.toISOString ) {
     }
     var userName = user.screen_name || user;
     var userFullname = user.name || d.from_user_name;
-    msg += '<a href="' + profileURL + '" style="text-decoration: none;"><b>' +
-      userName + '</b></a>&nbsp;&nbsp;<span style="color:#999;">' +
-      userFullname + '</span><br />';
+    msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
+      '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
+      '@' + userName + '</a></span><br />';
     msg += text;
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
