@@ -112,6 +112,8 @@ if ( !Date.prototype.toISOString ) {
     var profileURL = d.profile_url || '#';
     var profileIMG = user.profile_image_url || d.profile_image_url ||
         '/extensions/WEnotes/missing.gif';
+    var userName = user.screen_name || user;
+    var userFullname = user.name || d.from_user_name;
 
     switch (source) {
     case 'wikieducator':
@@ -138,47 +140,17 @@ if ( !Date.prototype.toISOString ) {
 
     msg = '<div id="WEitf' + d._id + '" style="margin: 2px;">';
     console.log('source', source);
-    if (source === 'xwikieducator') {
-      console.log('weavatars', weavatars);
-      console.log('from_user:', d.from_user, 'profileIMG:', profileIMG);
-      if (d.from_user in weavatars) {
-        if (weavatars[d.from_user].url) {
-          //debug.log('have an avatar for ' + d.from_user + ': ' +
-          //  weavatars[d.from_user].url);
-          profileIMG = weavatars[d.from_user].url;
-          msg += '<div style="float: left; width: 48px; height: 48px;">';
-          msg += '<a href="' + profileURL + '"><img src="' + profileIMG +
-            '" border=0 style="float: right;"></a></div>' +
-            '<div style="margin-left: 53px;">';
-        } else {
-          // cached a "don't know" value for the thumbnail
-          profileIMG = '/extensions/WEnotes/missing.gif';
-          //debug.log('need thumbnail for ' + d.from_user + ': ' +
-          //  weavatars[d.from_user].file);
-          msg += '<div style="float: left; width: 48px; height: 48px;">';
-          msg += '<a href="' + profileURL + '"><img class="' +
-            d.from_user.replace(/ /g, '_') + '" src="' + profileIMG +
-            '" border=0 style="float: right;"></a></div>' +
-            '<div style="margin-left: 53px;">';
-        }
-      } else {
-        if ($.inArray(d.from_user, thumbnailsNeeded) === -1) {
-          thumbnailsNeeded.push(d.from_user);
-        }
-        profileIMG = '/extensions/WEnotes/missing.gif';
-        msg += '<div style="float: left; width: 48px; height: 48px;">';
-        msg += '<a href="' + profileURL + '"><img class="' +
-          d.from_user.replace(/ /g, '_') + '" src="' + profileIMG +
-          '" border=0 style="float: right;"></a></div>' +
-          '<div style="margin-left: 53px;">';
-      }
-    } else {
-      msg += '<a href="' + profileURL + '"><img src="' + profileIMG +
-        '" border=0 style="float: left;" height=48 width=48></a>' +
-        '<div style="margin-left: 53px;">';
+    msg += '<a href="' + profileURL + '"><img ';
+    if (profileIMG === '/extensions/WEnotes/missing.gif') {
+      // try to make a legal class name, after encoding, encode any
+      //   underscores as well... and then replace % with _
+      encName = encodeURIComponent(userName).replace(/_/g, '%5F')
+          .replace(/%/g, '_');
+      msg += 'class="WEni_' + encName +'" ';
     }
-    var userName = user.screen_name || user;
-    var userFullname = user.name || d.from_user_name;
+    msg += 'src="' + profileIMG +
+      '" border=0 style="float: left;" height=48 width=48></a>' +
+      '<div style="margin-left: 53px;">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
