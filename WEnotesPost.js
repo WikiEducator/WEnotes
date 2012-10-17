@@ -64,7 +64,6 @@ function WEnotesPost(id, tag, button, leftmargin) {
         $button.removeAttr('disabled');
         $text.val('');
         $counter.text(140);
-        $('div.WEnotes:first').triggerHandler('WEnotes', [tag]);
       }
     });
     return false;

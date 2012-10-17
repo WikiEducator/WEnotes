@@ -39,8 +39,9 @@ if ( !Date.prototype.toISOString ) {
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://wikieducator.iriscouch.com/';
-  var couchURL = couchHost + 'mentions/_design/messages/_view/tag_time?';
+  var couchHost = 'http://wikieducator.iriscouch.com/',
+      couchDB = 'mentions',
+      couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?';
 
   function formatMessage(d) {
     var msg;
@@ -135,7 +136,7 @@ if ( !Date.prototype.toISOString ) {
       break;
     }
 
-    msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
+    msg = '<div id="WEitf' + d._id + '" style="margin: 2px;">';
     console.log('source', source);
     if (source === 'xwikieducator') {
       console.log('weavatars', weavatars);
@@ -191,8 +192,14 @@ if ( !Date.prototype.toISOString ) {
       dt_ago + '</a>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://wikieducator.iriscouch.com:5984/_utils/#/mentions/' +
+        '<a href="http://wikieducator.iriscouch.com:5984/_utils/#/' +
+        couchDB + '/' +
         d._id + '">db</a>';
+      /*
+      msg += '&nbsp;&nbsp;&nbsp;' +
+        '<a href="#" class="WEnd" id="WEnd_' + d._id + '_' + d._rev +
+        '">del</a>';
+      */
     }
     msg += '</span></div><br clear="both"></div>';
     return msg;
@@ -211,36 +218,30 @@ if ( !Date.prototype.toISOString ) {
   }
 
   /*
-  function getThumbnails() {
-    var couchURL = couchHost + 'weavatars/_all_docs?',
-        options = {
-          keys: '["' + thumbnailsNeeded.join('","') + '"]',
-          include_docs: true
-        };
-    $.ajax({
-      url: couchURL + makeCouchqs(options),
-      cache: false,
-      dataType: 'jsonp',
-      success: function(data) {
-        var i, url, user, userUnderscore;
-        for (i = 0; i < data.rows.length; i++) {
-          if (data.rows[i].error) {
-            url = '';
-            user = data.rows[i].key;
-          } else {
-            url = data.rows[i].doc.url;
-            user = data.rows[i].id;
+  function delDoc(event) {
+    var id, rev, part = [];
+    console.log(event.target, event.target.id);
+    if (event && event.target && event.target.id) {
+      part = event.target.id.split('_');
+      if (part.length === 3) {
+        id = part[1];
+        rev = part[2];
+        console.log('id',id,'rev',rev);
+        $.ajax({
+          url: couchHost + couchDB + '/' + id,
+          type: 'PUT',
+          datatype: 'jsonp',
+          data: {
+            _rev: rev,
+            _deleted: true
+          },
+          success: function() {
+            $('#WEitf' + id).css('opacity', '0.5')
+              .css('filter', 'alpha(opacity = 50)');
           }
-          weavatars[user] = {};
-          weavatars[user].url = url;
-          if (url) {
-            userUnderscore = data.rows[i].id.replace(/ /g, '_');
-            $('img.' + userUnderscore).attr('src', url);
-          }
-        }
-        thumbnailsNeeded = [];
+        });
       }
-    });
+    }
   }
   */
 
@@ -293,14 +294,10 @@ if ( !Date.prototype.toISOString ) {
               wendivs[ix].first = d.we_timestamp;
             }
             $(mid).before(formatMessage(d));
-            $('#WEitf'+id).find('abbr.timeago').timeago();
+            $('#WEitf'+d._id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
-          /*
-          if (thumbnailsNeeded.length) {
-            getThumbnails();
-          }
-          */
+
           $wenmdi.css('visibility', 'hidden');
           $wenm.css('visibility', 'visible');
           wendivs[ix].moreCount += 20;
@@ -373,7 +370,7 @@ if ( !Date.prototype.toISOString ) {
               wendivs[ix].first = d.we_timestamp;
             }
             $(lid).after(formatMessage(d));
-            lid = '#WEitf' + id;
+            lid = '#WEitf' + d._id;
             $(lid).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
@@ -382,20 +379,22 @@ if ( !Date.prototype.toISOString ) {
             $(did + ' > div:last').remove();
           }
           */
-          /*
-          if (thumbnailsNeeded.length) {
-            getThumbnails();
-          }
-          */
-
-          dx.timer = setTimeout(function() {$('div.WEnotes:first')
-                      .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         }
     });
   }
 
-  function newPost(message, i) {
-    console.log('new message for div', i, message);
+  function newPost(i, message) {
+    console.log('new message for div', i, message, wendivs);
+    // FIXME keep a local cache of IDs rather than querying DOM?
+    if ($('#WEitf' + message._id).length === 0) {
+      var wd = wendivs[i-1];
+      tag = wd.tag;
+      wd.$d.after(formatMessage(message));
+      $('#WEitf'+ message._id).find('abbr.timeago').timeago();
+      console.log('Faye inserted');
+    } else {
+      console.log('duplicate received from Faye', message.id);
+    }
   }
 
   function WEnotesHandler(event, tag) {
@@ -431,6 +430,7 @@ if ( !Date.prototype.toISOString ) {
         console.log('args=', args);
         if (args.length === 3) {
           tag = args[2];
+          console.log('about to add to wendivs', wendivs);
           wendivs.push({
             $d: $thisd,
             count: args[1],
@@ -440,8 +440,12 @@ if ( !Date.prototype.toISOString ) {
             moreCount: 20
           });
           console.log(i, tag, wendivs[i-1]);
+          console.log('wendivs now', wendivs);
+
           console.log('attempt to subscribe', '/WEnotes/' + tag);
-          subs[i] = client.subscribe('/WEnotes/' + tag, newPost);
+          subs[i] = client.subscribe('/WEnotes/' + tag, function(msg) {
+            newPost(i, msg);
+          });
           console.log('back from subscribe call');
           subs[i].callback(function() {
             console.log("subscription active", '/wenotes/' + tag);
@@ -451,6 +455,9 @@ if ( !Date.prototype.toISOString ) {
     });
   });
   $('div.WEnotes').on('WEnotes', WEnotesHandler);
+  /*
+  $(document).on('click', 'a.WEnd', {}, delDoc);
+  */
   if (wendivs.length) {
     $('div.WEnotes:first').triggerHandler('WEnotes');
   }
