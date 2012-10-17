@@ -61,7 +61,7 @@ class APIWEnotes extends ApiQueryBase {
 		$sag = new Sag($wgWEnotesHost, $wgWEnotesPort);
 		$sag->setDatabase($wgWEnotesAvatarsDB);
 		try {
-			$userName = urlencode($wgUser->getName());
+			$userName = $wgUser->getName();
 			$imgurl = $sag->get($userName)->body->url;
 		} catch(Exception $e) {
 			error_log('Error: ' . $e->getCode() .
