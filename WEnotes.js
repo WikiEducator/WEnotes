@@ -1,3 +1,8 @@
+/* IE7 shim
+var console = {
+  log: function () {}
+}
+*/
 /* shim for toISOString()
  */
 
@@ -406,7 +411,7 @@ if ( !Date.prototype.toISOString ) {
 
   console.log('WENotes!');
   // only create one Faye client per page
-  if (!window.hasOwnProperty('WEFclient')) {
+  if (!window.WEFclient) {
     console.log("creating new Faye client");
     window.WEFclient = new Faye.Client('http://live.oer.me:80/faye', {
       timeout: 120
