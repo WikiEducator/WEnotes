@@ -34,7 +34,6 @@ if ( !Date.prototype.toISOString ) {
   var wendivs = [];
   var weavatars = {
   };
-  var thumbnailsNeeded = [];
 
 (function () {
 
@@ -162,44 +161,9 @@ if ( !Date.prototype.toISOString ) {
     }
 
     msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
-    if (d.we_source === 'wikieducator') {
-      //debug.log('weavatars', weavatars);
-      if (d.from_user in weavatars) {
-        if (weavatars[d.from_user].url) {
-          //debug.log('have an avatar for ' + d.from_user + ': ' +
-          //  weavatars[d.from_user].url);
-          profileIMG = weavatars[d.from_user].url;
-          msg += '<div style="float: left; width: 48px; height: 48px;">';
-          msg += '<a href="' + profileURL + '"><img src="' + profileIMG +
-            '" border=0 style="float: right;"></a></div>' +
-            '<div style="margin-left: 53px;">';
-        } else {
-          // cached a "don't know" value for the thumbnail
-          profileIMG = '/extensions/WEnotes/missing.gif';
-          //debug.log('need thumbnail for ' + d.from_user + ': ' +
-          //  weavatars[d.from_user].file);
-          msg += '<div style="float: left; width: 48px; height: 48px;">';
-          msg += '<a href="' + profileURL + '"><img class="' +
-            d.from_user.replace(/ /g, '_') + '" src="' + profileIMG +
-            '" border=0 style="float: right;"></a></div>' +
-            '<div style="margin-left: 53px;">';
-        }
-      } else {
-        if ($.inArray(d.from_user, thumbnailsNeeded) === -1) {
-          thumbnailsNeeded.push(d.from_user);
-        }
-        profileIMG = '/extensions/WEnotes/missing.gif';
-        msg += '<div style="float: left; width: 48px; height: 48px;">';
-        msg += '<a href="' + profileURL + '"><img class="' +
-          d.from_user.replace(/ /g, '_') + '" src="' + profileIMG +
-          '" border=0 style="float: right;"></a></div>' +
-          '<div style="margin-left: 53px;">';
-      }
-    } else {
-      msg += '<a href="' + profileURL + '"><img src="' + profileIMG +
-        '" border=0 style="float: left;" height=48 width=48></a>' +
-        '<div style="margin-left: 53px;">';
-    }
+    msg += '<a href="' + profileURL + '"><img src="' + profileIMG +
+      '" border=0 style="float: left;" height=48 width=48></a>' +
+      '<div style="margin-left: 53px;">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
@@ -230,38 +194,6 @@ if ( !Date.prototype.toISOString ) {
       }
     }
     return optionList.join('&');
-  }
-
-  function getThumbnails() {
-    var couchURL = couchHost + 'weavatars/_all_docs?',
-        options = {
-          keys: '["' + thumbnailsNeeded.join('","') + '"]',
-          include_docs: true
-        };
-    $.ajax({
-      url: couchURL + makeCouchqs(options),
-      cache: false,
-      dataType: 'jsonp',
-      success: function(data) {
-        var i, url, user, userUnderscore;
-        for (i = 0; i < data.rows.length; i++) {
-          if (data.rows[i].error) {
-            url = '';
-            user = data.rows[i].key;
-          } else {
-            url = data.rows[i].doc.url;
-            user = data.rows[i].id;
-          }
-          weavatars[user] = {};
-          weavatars[user].url = url;
-          if (url) {
-            userUnderscore = data.rows[i].id.replace(/ /g, '_');
-            $('img.' + userUnderscore).attr('src', url);
-          }
-        }
-        thumbnailsNeeded = [];
-      }
-    });
   }
 
   function getMore(event) {
@@ -315,9 +247,6 @@ if ( !Date.prototype.toISOString ) {
             $(mid).before(formatMessage(d));
             $('#WEitf'+id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
-          }
-          if (thumbnailsNeeded.length) {
-            getThumbnails();
           }
           $wenmdi.css('visibility', 'hidden');
           $wenm.css('visibility', 'visible');
@@ -400,9 +329,6 @@ if ( !Date.prototype.toISOString ) {
             $(did + ' > div:last').remove();
           }
           */
-          if (thumbnailsNeeded.length) {
-            getThumbnails();
-          }
 
           dx.timer = setTimeout(function() {$('div.WEnotes:first')
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
