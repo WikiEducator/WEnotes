@@ -62,6 +62,7 @@ if ( !Date.prototype.toISOString ) {
     var source = d.we_source;
     var user = d.user || d.from_user || d.actor.id;
 
+    var text = d.text;
     var timeLink = '#';
     var profileURL = d.profile_url || '#';
     var profileIMG = user.profile_image_url || d.profile_image_url ||
@@ -79,12 +80,11 @@ if ( !Date.prototype.toISOString ) {
       break;
     case 'identica':
       timeLink = 'http://identi.ca/notice/' + d.id;
-      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
       profileURL = user.statusnet_profile_url;
       break;
     case 'g+':
       timeLink = d.url.replace('https://', 'http://');
-      d.text = d.title;
+      text = d.title;
       profileURL = d.actor.url.replace('https://', 'http://');
       profileIMG = d.actor.image.url.replace('https://', 'http://');
       userFullname = d.actor.displayName;
@@ -95,10 +95,6 @@ if ( !Date.prototype.toISOString ) {
     case 'moodle':
     case 'ask':
       timeLink = d.we_link;
-      if (d.truncated) {
-        text = text.substring(0, text.lastIndexOf('...')) +
-          '<a class="external text" href="' + d.we_link + '">...</a>';
-      }
       break;
     }
 
@@ -106,7 +102,7 @@ if ( !Date.prototype.toISOString ) {
     // Copyright Kent Brewster 2008  CC-BY-SA-3
     // see http://kentbrewster.com/identica-badge for info
     // FIXME unfortunately \w is too lenient when livening URLs
-    var text = d.text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
+    text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
       function(sub, type, scheme, url, word, offset, full) {
         var moniker;
         //debug.log("====\nsub:" + sub + "\ntype:" + type +
@@ -148,6 +144,22 @@ if ( !Date.prototype.toISOString ) {
         }
         return prefix+'<a href="' + href + '" target="_identica">' + label + '</a>';
       });
+
+    // liven abridged marks
+    switch (source) {
+    case 'identica':
+    case 'g+':
+      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
+      break;
+    case 'moodle':
+    case 'ask':
+    case 'feed':
+      if (d.truncated) {
+        text = text.substring(0, text.lastIndexOf('...')) +
+          '<a class="external text" href="' + d.we_link + '">...</a>';
+      }
+      break;
+    }
 
     msg = '<div id="WEitf' + id + '" style="margin: 2px;">';
     if (d.we_source === 'wikieducator') {
