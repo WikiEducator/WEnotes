@@ -204,7 +204,6 @@ if ( !Date.prototype.toISOString ) {
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
     msg += text;
-    console.log('d.created_at', d.created_at);
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
