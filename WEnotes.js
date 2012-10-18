@@ -44,22 +44,64 @@ if ( !Date.prototype.toISOString ) {
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?';
 
   function formatMessage(d) {
-    var msg;
+    var msg, userName, userFullname;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
       twitter: 'http://twitter.com/',
       identica: 'http://identi.ca/',
-      wikieducator: 'http://WikiEducator.org/User:'
+      wikieducator: 'http://WikiEducator.org/User:',
+      'g+': '#'
     };
     var sourceTag = {
       twitter: 'http://twitter.com/#!/search?q=%23',
       identica: 'http://identi.ca/tag/',
-      wikieducator: 'http://WikiEducator.org/'
+      wikieducator: 'http://WikiEducator.org/',
+      'g+': 'http://plus.google.com/s/%23'
     };
     var id = d.id;
-    var user = d.user || d.from_user;
     var source = d.we_source;
+    var user = d.user || d.from_user || d.actor.id;
+
+    var timeLink = '#';
+    var profileURL = d.profile_url || '#';
+    var profileIMG = user.profile_image_url || d.profile_image_url ||
+        '/extensions/WEnotes/missing.gif';
+    userName = user.screen_name || user;
+    userFullname = user.name || d.from_user_name;
+
+    switch (source) {
+    case 'wikieducator':
+      profileURL = 'http://WikiEducator.org/User:' + user;
+      break;
+    case 'twitter':
+      timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
+      profileURL = 'http://twitter.com/' + user;
+      break;
+    case 'identica':
+      timeLink = 'http://identi.ca/notice/' + d.id;
+      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
+      profileURL = user.statusnet_profile_url;
+      break;
+    case 'g+':
+      timeLink = d.url.replace('https://', 'http://');
+      d.text = d.title;
+      profileURL = d.actor.url.replace('https://', 'http://');
+      profileIMG = d.actor.image.url.replace('https://', 'http://');
+      userFullname = d.actor.displayName;
+      user = '';
+      userName = userFullname;
+      d.created_at = d.published;
+      break;
+    case 'moodle':
+    case 'ask':
+      timeLink = d.we_link;
+      if (d.truncated) {
+        text = text.substring(0, text.lastIndexOf('...')) +
+          '<a class="external text" href="' + d.we_link + '">...</a>';
+      }
+      break;
+    }
 
     // This text markup routine derived from one
     // Copyright Kent Brewster 2008  CC-BY-SA-3
@@ -108,38 +150,7 @@ if ( !Date.prototype.toISOString ) {
         return prefix+'<a href="' + href + '" target="_identica">' + label + '</a>';
       });
 
-    var timeLink = '#';
-    var profileURL = d.profile_url || '#';
-    var profileIMG = user.profile_image_url || d.profile_image_url ||
-        '/extensions/WEnotes/missing.gif';
-    var userName = user.screen_name || user;
-    var userFullname = user.name || d.from_user_name;
-
-    switch (source) {
-    case 'wikieducator':
-      profileURL = 'http://WikiEducator.org/User:' + user;
-      break;
-    case 'twitter':
-      timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
-      profileURL = 'http://twitter.com/' + user;
-      break;
-    case 'identica':
-      timeLink = 'http://identi.ca/notice/' + d.id;
-      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
-      profileURL = user.statusnet_profile_url;
-      break;
-    case 'moodle':
-    case 'ask':
-      timeLink = d.we_link;
-      if (d.truncated) {
-        text = text.substring(0, text.lastIndexOf('...')) +
-          '<a class="external text" href="' + d.we_link + '">...</a>';
-      }
-      break;
-    }
-
     msg = '<div id="WEitf' + d._id + '" style="margin: 2px;">';
-    console.log('source', source);
     msg += '<a href="' + profileURL + '"><img ';
     if (profileIMG === '/extensions/WEnotes/missing.gif') {
       // try to make a legal class name, after encoding, encode any
@@ -155,6 +166,7 @@ if ( !Date.prototype.toISOString ) {
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
     msg += text;
+    console.log('d.created_at', d.created_at);
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
