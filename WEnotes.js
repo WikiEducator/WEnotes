@@ -179,7 +179,7 @@ if ( !Date.prototype.toISOString ) {
       dt_ago + '</a>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://wikieducator.iriscouch.com:5984/_utils/#/mentions/' +
+        '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?mentions/' +
         d._id + '">db</a>';
     }
     msg += '</span></div><br clear="both"></div>';
