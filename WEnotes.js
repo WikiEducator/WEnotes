@@ -38,7 +38,7 @@ if ( !Date.prototype.toISOString ) {
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://wikieducator.iriscouch.com/';
+  var couchHost = 'http://t.oerfoundation.org:5984/';
   var couchURL = couchHost + 'mentions/_design/messages/_view/tag_time?';
 
   function formatMessage(d) {
@@ -89,7 +89,9 @@ if ( !Date.prototype.toISOString ) {
       userFullname = d.actor.displayName;
       user = '';
       userName = userFullname;
-      d.created_at = d.published;
+      // old versions of IE don't understand ISO date format
+      var dp = d.published.split(/[-T.Z]/);
+      d.created_at = [dp[0], months[dp[1]-1], dp[2], ''].join(' ') + dp[3];
       break;
     case 'moodle':
     case 'ask':
