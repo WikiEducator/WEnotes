@@ -37,14 +37,11 @@ if ( !Date.prototype.toISOString ) {
 
   // variables made public to simplify debugging/monitoring
   var wendivs = [];
-  var weavatars = {
-  };
-  var thumbnailsNeeded = [];
 
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://t.oerfoundation.org:5984/',
+  var couchHost = 'http://wikieducator.iriscouch.com/',
       couchDB = 'mentions',
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?';
 
@@ -174,7 +171,7 @@ if ( !Date.prototype.toISOString ) {
     if (profileIMG === '/extensions/WEnotes/missing.gif') {
       // try to make a legal class name, after encoding, encode any
       //   underscores as well... and then replace % with _
-      encName = encodeURIComponent(userName).replace(/_/g, '%5F')
+      var encName = encodeURIComponent(userName).replace(/_/g, '%5F')
           .replace(/%/g, '_');
       msg += 'class="WEni_' + encName +'" ';
     }
@@ -185,7 +182,6 @@ if ( !Date.prototype.toISOString ) {
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
     msg += text;
-    console.log('d.created_at', d.created_at);
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
@@ -195,7 +191,7 @@ if ( !Date.prototype.toISOString ) {
       dt_ago + '</a>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://wikieducator.iriscouch.com:5984/_utils/#/' +
+        '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?' +
         couchDB + '/' +
         d._id + '">db</a>';
       /*
@@ -300,7 +296,6 @@ if ( !Date.prototype.toISOString ) {
             $('#WEitf'+d._id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
-
           $wenmdi.css('visibility', 'hidden');
           $wenm.css('visibility', 'visible');
           wendivs[ix].moreCount += 20;
@@ -391,7 +386,6 @@ if ( !Date.prototype.toISOString ) {
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
       var wd = wendivs[i-1];
-      tag = wd.tag;
       wd.$d.after(formatMessage(message));
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
       console.log('Faye inserted');
