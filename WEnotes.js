@@ -38,7 +38,7 @@ if ( !Date.prototype.toISOString ) {
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://t.oerfoundation.org:5984/';
+  var couchHost = 'http://wikieducator.iriscouch.com/';
   var couchURL = couchHost + 'mentions/_design/messages/_view/tag_time?';
 
   function formatMessage(d) {
