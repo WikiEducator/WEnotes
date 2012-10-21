@@ -1,8 +1,19 @@
-/* IE7 shim
-var console = {
-  log: function () {}
+/* IE console shim */
+if ( ! window.console ) {
+  (function() {
+    var names = ["log", "debug", "info", "warn", "error",
+        "assert", "dir", "dirxml", "group", "groupEnd", "time",
+        "timeEnd", "count", "trace", "profile", "profileEnd"],
+        i, l = names.length;
+
+    window.console = {};
+
+    for ( i = 0; i < l; i++ ) {
+      window.console[ names[i] ] = function() {};
+    }
+  }());
 }
-*/
+
 /* shim for toISOString()
  */
 
@@ -382,15 +393,11 @@ if ( !Date.prototype.toISOString ) {
   }
 
   function newPost(i, message) {
-    console.log('new message for div', i, message, wendivs);
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
       var wd = wendivs[i-1];
       wd.$d.after(formatMessage(message));
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
-      console.log('Faye inserted');
-    } else {
-      console.log('duplicate received from Faye', message.id);
     }
   }
 
@@ -405,29 +412,27 @@ if ( !Date.prototype.toISOString ) {
     });
   }
 
-  console.log('WENotes!');
   // only create one Faye client per page
   if (!window.WEFclient) {
-    console.log("creating new Faye client");
+    console.log("WEnotes created window.WEFclient");
     window.WEFclient = new Faye.Client('http://live.oer.me:80/faye', {
       timeout: 120
     });
+    if ($.browser.msie && parseInt($.browser.version, 10) <= 8) {
+      window.WEFclient.disable('autodisconnect');
+    }
   }
-  console.log('have Faye client');
   var client = window.WEFclient;
   var subs = [];
   $('div.WEnotes').each(function(i) {
     var $thisd = $(this);
     var classes = $(this).attr('class').split(/\s+/);
     $.each(classes, function(i, v) {
-      console.log("each classes", i);
       if (v.indexOf('WEnotes-') === 0) {
         var tag, message;
         var args = v.split('-', 3);
-        console.log('args=', args);
         if (args.length === 3) {
           tag = args[2];
-          console.log('about to add to wendivs', wendivs);
           wendivs.push({
             $d: $thisd,
             count: args[1],
@@ -436,16 +441,9 @@ if ( !Date.prototype.toISOString ) {
             first: '2999-12-31T23:59:59.999Z',
             moreCount: 20
           });
-          console.log(i, tag, wendivs[i-1]);
-          console.log('wendivs now', wendivs);
 
-          console.log('attempt to subscribe', '/WEnotes/' + tag);
           subs[i] = client.subscribe('/WEnotes/' + tag, function(msg) {
             newPost(i, msg);
-          });
-          console.log('back from subscribe call');
-          subs[i].callback(function() {
-            console.log("subscription active", '/wenotes/' + tag);
           });
         }
       }
