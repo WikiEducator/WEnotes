@@ -415,7 +415,7 @@ if ( !Date.prototype.toISOString ) {
   // only create one Faye client per page
   if (!window.WEFclient) {
     console.log("WEnotes created window.WEFclient");
-    window.WEFclient = new Faye.Client('http://live.oer.me:80/faye', {
+    window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
       timeout: 120
     });
     if ($.browser.msie && parseInt($.browser.version, 10) <= 8) {
