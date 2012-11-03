@@ -108,6 +108,7 @@ if ( !Date.prototype.toISOString ) {
       var dp = d.published.split(/[-T.Z]/);
       d.created_at = [dp[0], months[dp[1]-1], dp[2], ''].join(' ') + dp[3];
       break;
+    case 'feed':
     case 'moodle':
     case 'ask':
       timeLink = d.we_link;
@@ -196,8 +197,13 @@ if ( !Date.prototype.toISOString ) {
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
-    msg += '<br /><span style="color: #999; font-size: smaller;">' +
-      d.we_source + '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
+    msg += '<br /><span style="color: #999; font-size: smaller;">';
+    if (d.we_source === 'feed') {
+      msg += '<span title="' + d.we_feed + '">blog</span>';
+    } else {
+      msg += d.we_source;
+    }
+    msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
@@ -295,7 +301,6 @@ if ( !Date.prototype.toISOString ) {
           }
           for (i=1; i < rows.length; i++) {
             d = rows[i].doc;
-            //debug.log(i, d);
             id = d.id;
             if (d.we_timestamp > wendivs[ix].last) {
               wendivs[ix].last = d.we_timestamp;
@@ -370,7 +375,6 @@ if ( !Date.prototype.toISOString ) {
           }
           for (i=0; i<rows.length; i++) {
             var d = rows[i].doc;
-            //debug.log(i, d);
             var id = d.id;
             if (d.we_timestamp > wendivs[ix].last) {
               wendivs[ix].last = d.we_timestamp;
@@ -414,7 +418,6 @@ if ( !Date.prototype.toISOString ) {
 
   // only create one Faye client per page
   if (!window.WEFclient) {
-    console.log("WEnotes created window.WEFclient");
     window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
       timeout: 120
     });
