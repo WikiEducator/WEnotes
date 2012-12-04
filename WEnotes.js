@@ -179,7 +179,8 @@ if ( !Date.prototype.toISOString ) {
     }
 
     msg = '<div id="WEitf' + d._id + '" style="margin: 2px;">';
-    msg += '<a href="' + profileURL + '"><img ';
+    msg += '<div style="float: left; width: 48px;"><a href="' +
+            profileURL + '"><img ';
     if (profileIMG === '/extensions/WEnotes/missing.gif') {
       // try to make a legal class name, after encoding, encode any
       //   underscores as well... and then replace % with _
@@ -187,9 +188,16 @@ if ( !Date.prototype.toISOString ) {
           .replace(/%/g, '_');
       msg += 'class="WEni_' + encName +'" ';
     }
+    // WikiEducator images are not necessarily square
+    // try to get the width from the URL
+    var imgwidth = 48;
+    var mo = profileIMG.match(/http:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
+    if (mo) {
+      imgwidth = mo[1];
+    }
     msg += 'src="' + profileIMG +
-      '" border=0 style="float: left;" height=48 width=48></a>' +
-      '<div style="margin-left: 53px;">';
+      '" border=0 style="float: right;" height=48 width=' + imgwidth +
+      '></a></div><div style="margin-left: 53px;">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
