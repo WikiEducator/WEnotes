@@ -207,14 +207,15 @@ if ( !Date.prototype.toISOString ) {
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
     msg += '<br /><span style="color: #999; font-size: smaller;">';
-    if (tag === '*') {
+    if (tag === '_') {
       if (d.we_tags) {
         for (i=0; i<d.we_tags.length; i++) {
-          msg += d.we_tags[i] + ' ';
+          msg += '#' + d.we_tags[i] + '&nbsp;';
         }
       } else {
-        msg += d.we_tag + ' ';
+        msg += '#' + d.we_tag + '&nbsp;';
       }
+      msg += '&nbsp;&nbsp;';
     }
     if (d.we_source === 'feed') {
       msg += '<span title="' + d.we_feed + '">blog</span>';
@@ -290,7 +291,7 @@ if ( !Date.prototype.toISOString ) {
     
     $wenmdi.css('visibility', 'visible');
     $wenm.css('visibility', 'hidden');
-    if (tag === '*') {
+    if (tag === '_') {
       url = couchURLall;
       options= {
         startkey: '"' + wendivs[ix].first +'"',
@@ -365,7 +366,7 @@ if ( !Date.prototype.toISOString ) {
     }
     var refreshtime = 30000;
 
-    if (tag === '*') {
+    if (tag === '_') {
       url = couchURLall;
       options = {
         endkey: '"' + lastplus + '"',
@@ -489,7 +490,8 @@ if ( !Date.prototype.toISOString ) {
             moreCount: 20
           });
 
-          subs[i] = client.subscribe('/WEnotes/' + tag, function(msg) {
+          subs[i] = client.subscribe('/WEnotes/' +
+                    (tag === '_') ? '*' : tag, function(msg) {
             newPost(i, msg);
           });
         }
@@ -497,9 +499,6 @@ if ( !Date.prototype.toISOString ) {
     });
   });
   $('div.WEnotes').on('WEnotes', WEnotesHandler);
-  /*
-  $(document).on('click', 'a.WEnd', {}, delDoc);
-  */
   if (wendivs.length) {
     $('div.WEnotes:first').triggerHandler('WEnotes');
   }
