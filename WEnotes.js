@@ -54,10 +54,11 @@ if ( !Date.prototype.toISOString ) {
   // scheme, host:port
   var couchHost = 'http://wikieducator.iriscouch.com/',
       couchDB = 'mentions',
-      couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?';
+      couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
+      couchURLall = couchHost + couchDB + '/_design/messages/_view/time?';
 
-  function formatMessage(d) {
-    var msg, userName, userFullname;
+  function formatMessage(d, tag) {
+    var msg, userName, userFullname, i;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
@@ -206,6 +207,15 @@ if ( !Date.prototype.toISOString ) {
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
     msg += '<br /><span style="color: #999; font-size: smaller;">';
+    if (tag === '*') {
+      if (d.we_tags) {
+        for (i=0; i<d.we_tags.length; i++) {
+          msg += d.we_tags[i] + ' ';
+        }
+      } else {
+        msg += d.we_tag + ' ';
+      }
+    }
     if (d.we_source === 'feed') {
       msg += '<span title="' + d.we_feed + '">blog</span>';
     } else {
@@ -270,6 +280,7 @@ if ( !Date.prototype.toISOString ) {
   */
 
   function getMore(event) {
+    var options, url;
     //debug.log('getMore', event.data.ix);
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
@@ -279,16 +290,28 @@ if ( !Date.prototype.toISOString ) {
     
     $wenmdi.css('visibility', 'visible');
     $wenm.css('visibility', 'hidden');
-    var options = {
-      key: '["' + tag + '"]',
-      startkey: '["' + tag + '", "' + wendivs[ix].first +'"]',
-      endkey: '["' + tag + '", "2011-01-01T00:00:00.000Z"]',
-      descending: true,
-      include_docs: true,
-      limit: count
-    };
+    if (tag === '*') {
+      url = couchURLall;
+      options= {
+        startkey: '"' + wendivs[ix].first +'"',
+        endkey: '"2011-01-01T00:00:00.000Z"',
+        descending: true,
+        include_docs: true,
+        limit: count
+      };
+    } else {
+      url = couchURL;
+      options = {
+        key: '["' + tag + '"]',
+        startkey: '["' + tag + '", "' + wendivs[ix].first +'"]',
+        endkey: '["' + tag + '", "2011-01-01T00:00:00.000Z"]',
+        descending: true,
+        include_docs: true,
+        limit: count
+      };
+    }
     $.ajax({
-        url: couchURL + makeCouchqs(options),
+        url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
         failure: function() {
@@ -316,7 +339,7 @@ if ( !Date.prototype.toISOString ) {
             if (d.we_timestamp < wendivs[ix].first) {
               wendivs[ix].first = d.we_timestamp;
             }
-            $(mid).before(formatMessage(d));
+            $(mid).before(formatMessage(d, tag));
             $('#WEitf'+d._id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
@@ -328,6 +351,7 @@ if ( !Date.prototype.toISOString ) {
   }
 
   function WEnotes(ix) {
+    var url, options;
     var dx = wendivs[ix];
     //debug.log('WEnotes function', ix, dx);
 
@@ -341,16 +365,28 @@ if ( !Date.prototype.toISOString ) {
     }
     var refreshtime = 30000;
 
-    var options = {
-      key: '["' + tag + '"]',
-      startkey: '["' + tag + '",{}]',
-      endkey: '["' + tag + '", "' + lastplus + '"]',
-      descending: true,
-      include_docs: true,
-      limit: count
-    };
+    if (tag === '*') {
+      url = couchURLall;
+      options = {
+        endkey: '"' + lastplus + '"',
+        descending: true,
+        include_docs: true,
+        limit: count
+      };
+    } else {
+      url = couchURL;
+      options = {
+        key: '["' + tag + '"]',
+        startkey: '["' + tag + '",{}]',
+        endkey: '["' + tag + '", "' + lastplus + '"]',
+        descending: true,
+        include_docs: true,
+        limit: count
+      };
+    }
+
     $.ajax({
-        url: couchURL + makeCouchqs(options),
+        url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
         failure: function() {
@@ -390,7 +426,7 @@ if ( !Date.prototype.toISOString ) {
             if (d.we_timestamp < wendivs[ix].first) {
               wendivs[ix].first = d.we_timestamp;
             }
-            $(lid).after(formatMessage(d));
+            $(lid).after(formatMessage(d, tag));
             lid = '#WEitf' + d._id;
             $(lid).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
@@ -408,7 +444,7 @@ if ( !Date.prototype.toISOString ) {
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
       var wd = wendivs[i-1];
-      wd.$d.after(formatMessage(message));
+      wd.$d.after(formatMessage(message, wd.tag));
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
     }
   }
