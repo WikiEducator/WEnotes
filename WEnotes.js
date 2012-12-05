@@ -442,11 +442,19 @@ if ( !Date.prototype.toISOString ) {
   }
 
   function newPost(i, message) {
+    // ignore design updates
+    if (message._id.charAt(0) === '_') {
+      return;
+    }
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
       var wd = wendivs[i-1];
       wd.$d.after(formatMessage(message, wd.tag));
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
+    } else { // we've seen this message, is it going away?
+      if (message.we_d) {
+        $('#WEitf' + message._id).hide('fast')
+      }
     }
   }
 
