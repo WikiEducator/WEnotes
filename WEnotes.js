@@ -491,7 +491,7 @@ if ( !Date.prototype.toISOString ) {
           });
 
           subs[i] = client.subscribe('/WEnotes/' +
-                    (tag === '_') ? '*' : tag, function(msg) {
+                    ((tag === '_') ? '*' : tag), function(msg) {
             newPost(i, msg);
           });
         }
