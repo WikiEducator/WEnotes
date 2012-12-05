@@ -73,7 +73,6 @@ if ( !Date.prototype.toISOString ) {
       wikieducator: 'http://WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
     };
-    var id = d.id;
     var source = d.we_source;
     var user = d.user || d.from_user || d.actor.id;
 
@@ -358,7 +357,6 @@ if ( !Date.prototype.toISOString ) {
 
     var tag = dx.tag || 'wikieducator';
     var count = dx.count || 20;
-    var last = dx.last || '2011-01-01T00:00:00.000Z';
     // exploits knowing the milliseconds of all we_timestamp = .000
     var lastplus = dx.last.slice(0, -2) + '1Z';
     if (dx.timer) {
@@ -401,8 +399,7 @@ if ( !Date.prototype.toISOString ) {
             wendivs[ix].nospinner = true;
             dx.$d.find('.WEnotesSpinner').remove();
           }
-          var i, j, msg, user;
-          var did = '.WEnotes';
+          var i;
           var lid = '.WEnotes';
           var rows = data.rows;
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
@@ -420,7 +417,6 @@ if ( !Date.prototype.toISOString ) {
           }
           for (i=0; i<rows.length; i++) {
             var d = rows[i].doc;
-            var id = d.id;
             if (d.we_timestamp > wendivs[ix].last) {
               wendivs[ix].last = d.we_timestamp;
             }
@@ -453,7 +449,7 @@ if ( !Date.prototype.toISOString ) {
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
     } else { // we've seen this message, is it going away?
       if (message.we_d) {
-        $('#WEitf' + message._id).hide('fast')
+        $('#WEitf' + message._id).hide('fast');
       }
     }
   }
@@ -485,7 +481,7 @@ if ( !Date.prototype.toISOString ) {
     var classes = $(this).attr('class').split(/\s+/);
     $.each(classes, function(i, v) {
       if (v.indexOf('WEnotes-') === 0) {
-        var tag, message;
+        var tag;
         var args = v.split('-', 3);
         if (args.length === 3) {
           tag = args[2];
