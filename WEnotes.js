@@ -228,7 +228,7 @@ if ( !Date.prototype.toISOString ) {
       msg += '&nbsp;&nbsp;&nbsp;' +
         '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?' +
         couchDB + '/' +
-        d._id + '">db</a>';
+        d._id + '" target="wenotesdb">db</a>';
       /*
       msg += '&nbsp;&nbsp;&nbsp;' +
         '<a href="#" class="WEnd" id="WEnd_' + d._id + '_' + d._rev +
