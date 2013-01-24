@@ -55,7 +55,8 @@ if ( !Date.prototype.toISOString ) {
   var couchHost = 'http://wikieducator.iriscouch.com/',
       couchDB = 'mentions',
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
-      couchURLall = couchHost + couchDB + '/_design/messages/_view/time?';
+      couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
+      weAPI = '/api.php';
 
   function formatMessage(d, tag) {
     var msg, userName, userFullname, i;
@@ -229,11 +230,9 @@ if ( !Date.prototype.toISOString ) {
         '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
-      /*
       msg += '&nbsp;&nbsp;&nbsp;' +
         '<a href="#" class="WEnd" id="WEnd_' + d._id + '_' + d._rev +
         '">del</a>';
-      */
     }
     msg += '</span></div><br clear="both"></div>';
     return msg;
@@ -394,14 +393,16 @@ if ( !Date.prototype.toISOString ) {
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
-          //debug.log(data);
-          if (!dx.nospinner) {
-            wendivs[ix].nospinner = true;
-            dx.$d.find('.WEnotesSpinner').remove();
-          }
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
+
+          if (!dx.nospinner) {
+            wendivs[ix].nospinner = true;
+            dx.$d.find('.WEnotesSpinner').before('<div id="WEnote0_' + ix + '"></div>');
+            dx.$d.find('.WEnotesSpinner').remove();
+            lid = '#WEnote0_' + ix;
+          }
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             $(lid).after('<div id="WEnotesMoreDiv' + ix +'">' +
@@ -445,7 +446,7 @@ if ( !Date.prototype.toISOString ) {
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
       var wd = wendivs[i-1];
-      wd.$d.after(formatMessage(message, wd.tag));
+      wd.$d.prepend(formatMessage(message, wd.tag));
       $('#WEitf'+ message._id).find('abbr.timeago').timeago();
     } else { // we've seen this message, is it going away?
       if (message.we_d) {
@@ -501,6 +502,26 @@ if ( !Date.prototype.toISOString ) {
         }
       }
     });
+  });
+  $('div.WEnotes').on('click', 'a.WEnd', function(event) {
+    var id = $(this).attr('id').split('_')[1];
+    console.log('click!', id);
+    $.ajax({
+      url: weAPI,
+      type: 'POST',
+      dataType: 'json',
+      data: {
+        action: 'wenotes',
+        noid: id,
+        format: 'json'
+      },
+      success: function() {
+      },
+      failure: function() {
+        alert('unable to delete');
+      }
+      });
+    return false;   // we got this
   });
   $('div.WEnotes').on('WEnotes', WEnotesHandler);
   if (wendivs.length) {
