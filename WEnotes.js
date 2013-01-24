@@ -445,9 +445,11 @@ if ( !Date.prototype.toISOString ) {
     }
     // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
-      var wd = wendivs[i-1];
-      wd.$d.prepend(formatMessage(message, wd.tag));
-      $('#WEitf'+ message._id).find('abbr.timeago').timeago();
+      if (!message.we_d) {   // don't show new deletions
+        var wd = wendivs[i-1];
+        wd.$d.prepend(formatMessage(message, wd.tag));
+        $('#WEitf'+ message._id).find('abbr.timeago').timeago();
+      }
     } else { // we've seen this message, is it going away?
       if (message.we_d) {
         $('#WEitf' + message._id).hide('fast');
