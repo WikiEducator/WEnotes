@@ -14,6 +14,7 @@ if( !defined( 'MEDIAWIKI' ) ) {
 require_once('sag/src/Sag.php');
 
 $wgExtensionCredits['parserhook'][] = array(
+	'path'           => __FILE__,
 	'name'           => 'WEnotes',
 	'version'        => '0.5',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
