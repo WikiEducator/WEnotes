@@ -33,6 +33,7 @@ class APIWEnotes extends ApiQueryBase {
 		global $wgWEnotesHost, $wgWEnotesPort;
 		global $wgWEnotesDB, $wgWEnotesAvatarsDB;
 		global $wgWEnotesUser, $wgWEnotesPasswd, $wgWEnotesTags;
+		global $wgWEnotesPostLimit;
 		$id = NULL;
 		$user = $wgUser->getId();
 		$params = $this->extractRequestParams();
@@ -62,7 +63,7 @@ class APIWEnotes extends ApiQueryBase {
 				$this->dieUsage('text argument not supplied',
 					'missingtext');
 			}
-			if (strlen($params['text']) > 200) {
+			if (strlen($params['text']) > $wgWEnotesPostLimit) {
 				$this->dieUsage('text posting too long',
 					'toolong');
 			}
