@@ -107,7 +107,7 @@ if ( !Date.prototype.toISOString ) {
       userName = userFullname;
       // old versions of IE don't understand ISO date format
       var dp = d.published.split(/[-T.Z]/);
-      d.created_at = [dp[0], months[dp[1]-1], dp[2], ''].join(' ') + dp[3];
+      d.created_at = [dp[0], months[dp[1]-1], dp[2], ''].join(' ') + dp[3] + ' GMT';
       break;
     case 'feed':
     case 'moodle':
