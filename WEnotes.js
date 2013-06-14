@@ -225,6 +225,12 @@ if ( !Date.prototype.toISOString ) {
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
+    if (d.we_source === 'twitter') {
+      msg += '&nbsp;&nbsp;&nbsp;<i class="icon-mail-reply"></i>';
+      msg += '&nbsp;&nbsp;&nbsp;<i class="icon-th-list"></i>';
+    }
+    msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
+    msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
         '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?' +
@@ -468,6 +474,10 @@ if ( !Date.prototype.toISOString ) {
     });
   }
 
+  $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />')
+  if ($.browser.msie && parseInt($.browser.version, 10) == 7) {
+    $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />')
+  }
   // only create one Faye client per page
   if (!window.WEFclient) {
     window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
