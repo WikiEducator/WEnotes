@@ -25,7 +25,6 @@
 
   "devDependencies": {
     "faye": "0.8.9",
-    "uglify-js": "1.3.5"
   }
 }
 
