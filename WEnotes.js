@@ -70,6 +70,12 @@ if ( !Date.prototype.toISOString ) {
     });
   }
 
+  function windowConv() {
+    var url = $(this).closest('.WEnote').find('abbr').parent().attr('href');
+    window.open(url, '_twitter');
+    return false;
+  }
+
   function like() {
     var mo, cl, tag = '';
     var id = $(this).closest('.WEnote').attr('id');
@@ -297,12 +303,10 @@ if ( !Date.prototype.toISOString ) {
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
     msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
-    /*
     if (d.we_source === 'twitter') {
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-mail-reply"></i>';
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-th-list"></i>';
     }
-    */
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -562,6 +566,7 @@ if ( !Date.prototype.toISOString ) {
     });
   });
   $('div.WEnotes').on('click', '.icon-star, .icon-star-empty', like);
+  $('div.WEnotes').on('click', '.icon-mail-reply, .icon-th-list', windowConv);
   $('div.WEnotes').on('click', 'a.WEnd', function(event) {
     var id = $(this).attr('id').split('_')[1];
     $.ajax({
