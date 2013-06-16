@@ -58,6 +58,54 @@ if ( !Date.prototype.toISOString ) {
       couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
       weAPI = '/api.php';
 
+  function API(data, success, failure) {
+    data.action || (data.action = 'query');
+    data.format || (data.format = 'json');
+    return $.ajax({
+      url: window.wgServer + weAPI,
+      type: 'POST',
+      data: data,
+      success: success,
+      failure: failure
+    });
+  }
+
+  function like() {
+    var mo, cl, tag = '';
+    var id = $(this).closest('.WEnote').attr('id');
+    var like = $(this).hasClass('icon-star-empty');
+    cl = $('#' + id).closest('.WEnotes').attr('class');
+    mo = /WEnotes-\d+-([^ ]+)/.exec(cl);
+    if (mo) {
+      tag = mo[1];
+    }
+    if (tag === '_') {
+      cl = $('#' + id + ' .WEtags').text();
+      mo = /#([a-zA-Z0-9]+)/.exec(cl);
+      if (mo) {
+        tag = mo[1];
+      }
+    }
+    // try to get the tag from the div
+    if (wgUserName && tag) {
+      API({
+        action: 'wevotes',
+        vopid: 'WN' + tag,
+        vovid: id.slice(5),
+        vovote: (like) ? 1 : 0,
+        vopage: wgArticleId
+      });
+      if (like) {
+        $(this).removeClass('icon-star-empty').addClass('icon-star');
+      } else {
+        $(this).removeClass('icon-star').addClass('icon-star-empty');
+      }
+    } else {
+      alert("You must be logged in to vote.");
+    }
+    return false;
+  }
+
   function formatMessage(d, tag) {
     var msg, userName, userFullname, i;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -179,8 +227,8 @@ if ( !Date.prototype.toISOString ) {
       break;
     }
 
-    msg = '<div id="WEitf' + d._id + '" style="margin: 2px;">';
-    msg += '<div style="float: left; width: 48px;"><a href="' +
+    msg = '<div id="WEitf' + d._id + '" class="WEnote">';
+    msg += '<div class="WEnotepic"><a href="' +
             profileURL + '"><img ';
     if (profileIMG === '/extensions/WEnotes/missing.gif') {
       // try to make a legal class name, after encoding, encode any
@@ -198,7 +246,7 @@ if ( !Date.prototype.toISOString ) {
     }
     msg += 'src="' + profileIMG +
       '" border=0 style="float: right;" height=48 width=' + imgwidth +
-      '></a></div><div style="margin-left: 53px;">';
+      '></a></div><div class="WEnotebody">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
@@ -209,12 +257,14 @@ if ( !Date.prototype.toISOString ) {
     msg += '<br /><span style="color: #999; font-size: smaller;">';
     if (tag === '_') {
       if (d.we_tags) {
+        msg += '<span class="WEtags">';
         for (i=0; i<d.we_tags.length; i++) {
           msg += '#' + d.we_tags[i] + '&nbsp;';
         }
       } else {
         msg += '#' + d.we_tag + '&nbsp;';
       }
+      msg += '</span>';
       msg += '&nbsp;&nbsp;';
     }
     if (d.we_source === 'feed') {
@@ -225,11 +275,13 @@ if ( !Date.prototype.toISOString ) {
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
+    msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
+    /*
     if (d.we_source === 'twitter') {
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-mail-reply"></i>';
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-th-list"></i>';
     }
-    msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
+    */
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -255,34 +307,6 @@ if ( !Date.prototype.toISOString ) {
     }
     return optionList.join('&');
   }
-
-  /*
-  function delDoc(event) {
-    var id, rev, part = [];
-    console.log(event.target, event.target.id);
-    if (event && event.target && event.target.id) {
-      part = event.target.id.split('_');
-      if (part.length === 3) {
-        id = part[1];
-        rev = part[2];
-        console.log('id',id,'rev',rev);
-        $.ajax({
-          url: couchHost + couchDB + '/' + id,
-          type: 'PUT',
-          datatype: 'jsonp',
-          data: {
-            _rev: rev,
-            _deleted: true
-          },
-          success: function() {
-            $('#WEitf' + id).css('opacity', '0.5')
-              .css('filter', 'alpha(opacity = 50)');
-          }
-        });
-      }
-    }
-  }
-  */
 
   function getMore(event) {
     var options, url;
@@ -464,7 +488,7 @@ if ( !Date.prototype.toISOString ) {
   }
 
   function WEnotesHandler(event, tag) {
-    //debug.log('WEnotesHandler', event, tag);
+    console.log('WEnotesHandler', event, tag);
     $.each(wendivs, function (i, v) {
       //debug.log('iterating through wendivs', i, v);
       if (tag && v.tag !== tag) {
@@ -472,12 +496,14 @@ if ( !Date.prototype.toISOString ) {
       }
       WEnotes(i);
     });
+    return false;
   }
 
-  $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />')
+  $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
   if ($.browser.msie && parseInt($.browser.version, 10) == 7) {
-    $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />')
+    $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
+  $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
     window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
@@ -515,9 +541,9 @@ if ( !Date.prototype.toISOString ) {
       }
     });
   });
+  $('div.WEnotes').on('click', '.icon-star, .icon-star-empty', like);
   $('div.WEnotes').on('click', 'a.WEnd', function(event) {
     var id = $(this).attr('id').split('_')[1];
-    console.log('click!', id);
     $.ajax({
       url: weAPI,
       type: 'POST',
