@@ -106,6 +106,27 @@ if ( !Date.prototype.toISOString ) {
     return false;
   }
 
+  function getFaves(tag, ids) {
+    if (tag === '_') return;
+    $.ajax({
+      url: couchHost + 'votes/_design/vote/_view/myvotes?key=' + encodeURIComponent(JSON.stringify(['WN'+tag, wgUserName])),
+      cache: false,
+      dataType: 'jsonp',
+      success: function(d) {
+        var i, l;
+        if (d.rows) {
+          l = d.rows.length;
+          for (i=0; i<l; i++) {
+            if (d.rows[i].value[1]) {
+              $('#WEitf'+d.rows[i].value[0]+' .icon-star-empty').removeClass('icon-star-empty')
+                                                                .addClass('icon-star');
+            }
+          }
+        }
+      }
+    });
+  }
+
   function formatMessage(d, tag) {
     var msg, userName, userFullname, i;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -310,7 +331,6 @@ if ( !Date.prototype.toISOString ) {
 
   function getMore(event) {
     var options, url;
-    //debug.log('getMore', event.data.ix);
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
         count = wendivs[ix].moreCount + 1,
@@ -380,9 +400,8 @@ if ( !Date.prototype.toISOString ) {
   }
 
   function WEnotes(ix) {
-    var url, options;
+    var url, options, ids=[];
     var dx = wendivs[ix];
-    //debug.log('WEnotes function', ix, dx);
 
     var tag = dx.tag || 'wikieducator';
     var count = dx.count || 20;
@@ -457,13 +476,14 @@ if ( !Date.prototype.toISOString ) {
             $(lid).after(formatMessage(d, tag));
             lid = '#WEitf' + d._id;
             $(lid).find('abbr.timeago').timeago();
-            //$(lid).effect("highlight", {}, 1500);
+            ids.push(d._id);
           }
           /* to stay at fixed length
           while ($(did + ' > div').length > count) {
             $(did + ' > div:last').remove();
           }
           */
+          getFaves(tag, ids);
         }
     });
   }
