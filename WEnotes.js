@@ -102,9 +102,13 @@ if ( !Date.prototype.toISOString ) {
         vopage: wgArticleId
       });
       if (like) {
-        $(this).removeClass('icon-star-empty').addClass('icon-star');
+        $(this).removeClass('icon-star-empty')
+               .addClass('icon-star')
+               .attr('title', 'unfavorite');
       } else {
-        $(this).removeClass('icon-star').addClass('icon-star-empty');
+        $(this).removeClass('icon-star')
+               .addClass('icon-star-empty')
+               .attr('title', 'favorite');
       }
     } else {
       alert("You must be logged in to vote.");
@@ -302,15 +306,15 @@ if ( !Date.prototype.toISOString ) {
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
-    msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
+    msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
     switch (source) {
     case 'twitter':
       // if the message is too old, don't show the conversation links
       if (((new Date().getTime() - dt.getTime())/86400000) > 5.0) break;
       // fall through to show links
     case 'g+':
-      msg += '&nbsp;&nbsp;&nbsp;<i class="icon-mail-reply"></i>';
-      msg += '&nbsp;&nbsp;&nbsp;<i class="icon-th-list"></i>';
+      msg += '&nbsp;&nbsp;&nbsp;<i title="reply" class="icon-mail-reply"></i>';
+      msg += '&nbsp;&nbsp;&nbsp;<i title="thread" class="icon-th-list"></i>';
     }
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
@@ -570,9 +574,9 @@ if ( !Date.prototype.toISOString ) {
       }
     });
   });
-  $('div.WEnotes').on('click', '.icon-star, .icon-star-empty', like);
-  $('div.WEnotes').on('click', '.icon-mail-reply, .icon-th-list', windowConv);
-  $('div.WEnotes').on('click', 'a.WEnd', function(event) {
+  $('div.WEnotes').on('click', '.icon-star, .icon-star-empty', like)
+              .on('click', '.icon-mail-reply, .icon-th-list', windowConv)
+              .on('click', 'a.WEnd', function(event) {
     var id = $(this).attr('id').split('_')[1];
     $.ajax({
       url: weAPI,
