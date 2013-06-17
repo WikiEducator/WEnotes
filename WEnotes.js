@@ -303,7 +303,12 @@ if ( !Date.prototype.toISOString ) {
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
     msg += '&nbsp;&nbsp;&nbsp;<i class="icon-star-empty"></i>';
-    if (d.we_source === 'twitter') {
+    switch (source) {
+    case 'twitter':
+      // if the message is too old, don't show the conversation links
+      if (((new Date().getTime() - dt.getTime())/86400000) > 5.0) break;
+      // fall through to show links
+    case 'g+':
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-mail-reply"></i>';
       msg += '&nbsp;&nbsp;&nbsp;<i class="icon-th-list"></i>';
     }
