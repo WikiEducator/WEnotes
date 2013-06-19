@@ -16,7 +16,7 @@ require_once('sag/src/Sag.php');
 $wgExtensionCredits['parserhook'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'WEnotes',
-	'version'        => '0.5',
+	'version'        => '0.6.0',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -68,6 +68,24 @@ class APIWEnotes extends ApiQueryBase {
 				$this->dieUsage('text posting too long',
 					'toolong');
 			}
+			$inreplyto = '';
+			if (isset($params['reply'])) {
+				$inreplyto = preg_replace('/[^a-z0-9]/i',
+					'', $params['reply']);
+				if ($inreplyto <> $params['reply']) {
+					$this->dieUsage('invalid reply id',
+						'invalidreplyid');
+				}
+			}
+			$inreplyroot = '';
+			if (isset($params['root'])) {
+				$inreplyroot = preg_replace('/[^a-z0-9]/i',
+					'', $params['reply']);
+				if ($inreplyroot <> $params['root']) {
+					$this->dieUsage('invalid reply id',
+						'invalidreplyid');
+				}
+			}
 		}
 
 		list($usec, $ts) = explode(' ', microtime());
@@ -112,6 +130,12 @@ class APIWEnotes extends ApiQueryBase {
 				'we_tags' => array($params['tag']),
 				'we_timestamp' => date('Y-m-d\TH:i:s.000\Z', $ts)
 			);
+			if ($inreplyto) {
+				$data['in_reply_to'] = $inreplyto;
+			}
+			if ($inreplyroot) {
+				$data['in_reply_root'] = $inreplyroot;
+			}
 			$sag->post($data);
 
 			$result = $this->getResult();
@@ -123,6 +147,8 @@ class APIWEnotes extends ApiQueryBase {
 		return array (
 			'tag' => null,
 			'text' => null,
+			'reply' => null,
+			'root' => null,
 			'id' => null,
 		);
 	}
@@ -131,6 +157,8 @@ class APIWEnotes extends ApiQueryBase {
 		return array (
 			'tag' => 'tag to apply to posting',
 			'text' => 'text to be posted',
+			'reply' => 'id of message this is a reply to',
+			'root' => 'root of thread',
 			'id' => 'id of existing item (only for edit)',
 		);
 	}
