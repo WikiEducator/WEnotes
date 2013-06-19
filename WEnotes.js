@@ -617,7 +617,7 @@ var WEnotes = {};
       }
     });
   });
-  $('div.WEnotes').on('click', '.icon-star, .icon-star-empty', like)
+  $('div.WEnotes,div.WEnotesList').on('click', '.icon-star, .icon-star-empty', like)
               .on('click', '.icon-mail-reply, .icon-th-list', windowConv)
               .on('click', 'a.WEnd', function(event) {
     var id = $(this).attr('id').split('_')[1];
