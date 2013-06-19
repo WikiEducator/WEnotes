@@ -46,8 +46,9 @@ if ( !Date.prototype.toISOString ) {
  * Available under CC-BY-SA license.
  */
 
-  // variables made public to simplify debugging/monitoring
-  var wendivs = [];
+// variables made public to simplify debugging/monitoring
+var wendivs = [];
+var WEnotes = {};
 
 (function () {
 
@@ -501,6 +502,48 @@ if ( !Date.prototype.toISOString ) {
     });
   }
 
+  // display list of ids in specified div
+  //  ids can be an array or a string with comma separator
+  function WEnotesList(div, ids) {
+    if (typeof ids === 'string') {
+      ids = ids.split(',');
+    }
+    $.ajax({
+      url: couchHost + couchDB + '/_all_docs?include_docs=true&keys=' + encodeURIComponent(JSON.stringify(ids)),
+      cache: false,
+      dataType: 'jsonp',
+      success: function(d) {
+        var i, rowsl = d.rows.length;
+        for (i=0; i<rowsl; i++) {
+          $(div).append(formatMessage(d.rows[i].doc, '_'));
+        }
+      }
+    });
+  }
+
+  // display most popular WEnotes for given tag in specified div
+  function WEnotesTop(div, tag, cnt) {
+    $.ajax({
+      url: couchHost + 'votes/_design/vote/_view/totals?group=true&startkey=' + encodeURIComponent(JSON.stringify(['WN' + tag])) + '&endkey=' + encodeURIComponent(JSON.stringify(['WN'+tag, {}])),
+      cache: false,
+      dataType: 'jsonp',
+      success: function(d) {
+        var i, rowsl = d.rows.length,
+            items = [], ids = [];
+        for (i=0; i<rowsl; i++) {
+          if (d.rows[i].value > 0) {
+            items.push([d.rows[i].value, d.rows[i].key[1]])
+          }
+        }
+        items.sort(function(a, b) {a = a[0]; b = b[0]; return a < b ? -1 : (a > b ? 1 : 0); });
+        for (i=0; (i<items.length) && (i<cnt); i++) {
+          ids.push(items[i][1]);
+        }
+        WEnotesList(div, ids);
+      }
+    });
+  }
+
   function newPost(i, message) {
     // ignore design updates
     if (message._id.charAt(0) === '_') {
@@ -599,4 +642,7 @@ if ( !Date.prototype.toISOString ) {
   if (wendivs.length) {
     $('div.WEnotes:first').triggerHandler('WEnotes');
   }
+  window.WEnotes.formatMessage = formatMessage;
+  window.WEnotes.list = WEnotesList;
+  window.WEnotes.top = WEnotesTop;
 }());
