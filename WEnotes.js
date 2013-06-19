@@ -138,7 +138,7 @@ var WEnotes = {};
     });
   }
 
-  function formatMessage(d, tag) {
+  function formatMessage(d, tag, novoting) {
     var msg, userName, userFullname, i;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -307,7 +307,9 @@ var WEnotes = {};
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
-    msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
+    if (!novoting) {
+      msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
+    }
     switch (source) {
     case 'twitter':
       // if the message is too old, don't show the conversation links
@@ -515,7 +517,7 @@ var WEnotes = {};
       success: function(d) {
         var i, rowsl = d.rows.length;
         for (i=0; i<rowsl; i++) {
-          $(div).append(formatMessage(d.rows[i].doc, '_'));
+          $(div).append(formatMessage(d.rows[i].doc, '_', true));
         }
       }
     });
