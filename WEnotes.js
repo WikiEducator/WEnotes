@@ -329,7 +329,7 @@ var WEnotes = {};
         '<a href="#" class="WEnd" id="WEnd_' + d._id + '_' + d._rev +
         '">del</a>';
     }
-    msg += '</span></div><br clear="both"></div>';
+    msg += '</span></div><br clear="both" /></div>';
     return msg;
   }
 
