@@ -271,14 +271,15 @@ var WEnotes = {};
     }
     // WikiEducator images are not necessarily square
     // try to get the width from the URL
-    var imgwidth = 48;
+    var imgwidth = (d.profile_image_width) ? d.profile_image_width : 48;
+    var imgheight = (d.profile_image_height) ? d.profile_image_height : 48;
     var mo = profileIMG.match(/http:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
     if (mo) {
       imgwidth = mo[1];
     }
     msg += 'src="' + profileIMG +
-      '" border=0 style="float: right;" height=48 width=' + imgwidth +
-      '></a></div><div class="WEnotebody">';
+      '" border=0 style="float: right;" height=' + imgheight +
+      ' width=' + imgwidth + '></a></div><div class="WEnotebody">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
       '@' + userName + '</a></span><br />';
