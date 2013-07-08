@@ -16,7 +16,7 @@ require_once('sag/src/Sag.php');
 $wgExtensionCredits['parserhook'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'WEnotes',
-	'version'        => '0.6.0',
+	'version'        => '0.6.1',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -130,6 +130,11 @@ class APIWEnotes extends ApiQueryBase {
 				'we_tags' => array($params['tag']),
 				'we_timestamp' => date('Y-m-d\TH:i:s.000\Z', $ts)
 			);
+			# if email adr available, store gravatar hash
+			$email = $wgUser->getEmail();
+			if ($email <> '') {
+				$data['gravatar'] = md5(strtolower(trim($email)));
+			}
 			if ($inreplyto) {
 				$data['in_reply_to'] = $inreplyto;
 			}
