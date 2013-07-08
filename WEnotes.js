@@ -286,16 +286,16 @@ var WEnotes = {};
       imgwidth = mo[1];
     }
     msg += 'src="' + profileIMG +
-      '" border=0 style="float: right;" height=' + imgheight +
+      '" height=' + imgheight +
       ' width=' + imgwidth + '></a></div><div class="WEnotebody">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
-      '<b>' + userFullname + '</b>&nbsp;&nbsp;<span style="color:#999;">' +
+      '<b>' + userFullname + '</b>&nbsp;&nbsp;<span class="WEnoteuser">' +
       '@' + userName + '</a></span><br />';
     msg += text;
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
       dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
-    msg += '<br /><span style="color: #999; font-size: smaller;">';
+    msg += '<br /><span class="WEnotesub">';
     if (tag === '_') {
       if (d.we_tags) {
         msg += '<span class="WEtags">';
@@ -484,7 +484,7 @@ var WEnotes = {};
               'margin-bottom: 1em; background-color: #f9f9f9;' +
               'border: 1px solid #aaaaaa; padding: 5px;">' +
               '<img src="/skins/common/images/Ajax-loader.gif" ' +
-              'style="fload: left; visibility: hidden;" height="16"' +
+              'style="float: left; visibility: hidden;" height="16"' +
               'width="16" /><a id="WEnotesMore' + ix +
               '" style="margin-right: 16px;">More ' + tag +
               ' notes</a></div></div><br clear="all" />');

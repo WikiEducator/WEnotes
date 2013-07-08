@@ -1,6 +1,9 @@
 .WEnote {margin: 2px;}
 .WEnotebody {margin-left: 53px;}
 .WEnotepic {float: left; width: 48px;}
+.WEnotepic img {border-radius: 3px; float: right; border: none;}
+.WEnoteuser {color:#999}
+.WEnotesub {color:#999; font-size: smaller;}
 
 .icon-mail-reply, .icon-th-list, .icon-star, .icon-star-empty {
   cursor: pointer;}
