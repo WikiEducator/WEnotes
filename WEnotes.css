@@ -4,6 +4,7 @@
 .WEnotepic img {border-radius: 3px; float: right; border: none;}
 .WEnoteuser {color:#999}
 .WEnotesub {color:#999; font-size: smaller;}
+.WEnotes a[href^="https://"] {background: none!important;}
 
 .icon-mail-reply, .icon-th-list, .icon-star, .icon-star-empty {
   cursor: pointer;}
