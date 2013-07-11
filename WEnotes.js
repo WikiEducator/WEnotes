@@ -97,7 +97,7 @@ var WEnotes = {};
     if (wgUserName && tag) {
       API({
         action: 'wevotes',
-        vopid: 'WN' + tag,
+        vopid: 'WN' + tag.toLowerCase(),
         vovid: id.slice(5),
         vovote: (like) ? 1 : 0,
         vopage: wgArticleId
@@ -119,6 +119,7 @@ var WEnotes = {};
 
   function getFaves(tag, ids) {
     if (tag === '_') return;
+    tag = tag.toLowerCase();
     $.ajax({
       url: couchHost + 'votes/_design/vote/_view/myvotes?key=' + encodeURIComponent(JSON.stringify(['WN'+tag, wgUserName])),
       cache: false,
@@ -358,6 +359,7 @@ var WEnotes = {};
     var options, url;
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
+        taglc = tag.toLowerCase(),
         count = wendivs[ix].moreCount + 1,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
@@ -376,9 +378,9 @@ var WEnotes = {};
     } else {
       url = couchURL;
       options = {
-        key: '["' + tag + '"]',
-        startkey: '["' + tag + '", "' + wendivs[ix].first +'"]',
-        endkey: '["' + tag + '", "2011-01-01T00:00:00.000Z"]',
+        key: '["' + taglc + '"]',
+        startkey: '["' + taglc + '", "' + wendivs[ix].first +'"]',
+        endkey: '["' + taglc + '", "2011-01-01T00:00:00.000Z"]',
         descending: true,
         include_docs: true,
         limit: count
@@ -429,6 +431,7 @@ var WEnotes = {};
     var dx = wendivs[ix];
 
     var tag = dx.tag || 'wikieducator';
+    var taglc = tag.toLowerCase();
     var count = dx.count || 20;
     // exploits knowing the milliseconds of all we_timestamp = .000
     var lastplus = dx.last.slice(0, -2) + '1Z';
@@ -448,9 +451,9 @@ var WEnotes = {};
     } else {
       url = couchURL;
       options = {
-        key: '["' + tag + '"]',
-        startkey: '["' + tag + '",{}]',
-        endkey: '["' + tag + '", "' + lastplus + '"]',
+        key: '["' + taglc + '"]',
+        startkey: '["' + taglc + '",{}]',
+        endkey: '["' + taglc + '", "' + lastplus + '"]',
         descending: true,
         include_docs: true,
         limit: count
@@ -534,6 +537,7 @@ var WEnotes = {};
 
   // display most popular WEnotes for given tag in specified div
   function WEnotesTop(div, tag, cnt) {
+    tag = tag.toLowerCase();
     $.ajax({
       url: couchHost + 'votes/_design/vote/_view/totals?group=true&startkey=' + encodeURIComponent(JSON.stringify(['WN' + tag])) + '&endkey=' + encodeURIComponent(JSON.stringify(['WN'+tag, {}])),
       cache: false,
@@ -621,7 +625,7 @@ var WEnotes = {};
           });
 
           subs[i] = client.subscribe('/WEnotes/' +
-                    ((tag === '_') ? '*' : tag), function(msg) {
+                    ((tag === '_') ? '*' : tag.toLowerCase()), function(msg) {
             newPost(i, msg);
           });
         }
