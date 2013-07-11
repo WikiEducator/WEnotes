@@ -364,8 +364,8 @@ var WEnotes = {};
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
     
-    $wenmdi.css('visibility', 'visible');
-    $wenm.css('visibility', 'hidden');
+    $wenmdi.show();
+    $wenm.hide();
     if (tag === '_') {
       url = couchURLall;
       options= {
@@ -391,8 +391,8 @@ var WEnotes = {};
         cache: false,
         dataType: 'jsonp',
         failure: function() {
-          $wenmdi.css('visibility', 'hidden');
-          $wenm.css('visibility', 'visible');
+          $wenmdi.hide();
+          $wenm.show();
         },
         success: function(data) {
           //debug.log(data);
@@ -419,11 +419,12 @@ var WEnotes = {};
             $('#WEitf'+d._id).find('abbr.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
-          $wenmdi.css('visibility', 'hidden');
-          $wenm.css('visibility', 'visible');
+          $wenmdi.hide();
+          $wenm.show();
           wendivs[ix].moreCount += 20;
         }
     });
+    return false;
   }
 
   function WEnotes(ix) {
@@ -482,15 +483,11 @@ var WEnotes = {};
           }
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
-            $(lid).after('<div id="WEnotesMoreDiv' + ix +'">' +
-              '<div style="float: left; margin-left: 53px;' +
-              'margin-bottom: 1em; background-color: #f9f9f9;' +
-              'border: 1px solid #aaaaaa; padding: 5px;">' +
-              '<img src="/skins/common/images/Ajax-loader.gif" ' +
-              'style="float: left; visibility: hidden;" height="16"' +
-              'width="16" /><a id="WEnotesMore' + ix +
-              '" style="margin-right: 16px;">More ' + tag +
-              ' notes</a></div></div><br clear="all" />');
+            $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
+              ix +'"><img src="/skins/common/images/Ajax-loader.gif" />' +
+              '<input id="WEnotesMore' + ix +
+              '" type="submit" value="More ' + tag + ' notes" />' +
+              '</div><br clear="all" />');
             $('#WEnotesMore' + ix).bind('click', { ix: ix }, getMore);
           }
           for (i=0; i<rows.length; i++) {

@@ -6,6 +6,9 @@
 .WEnotesub {color:#999; font-size: smaller;}
 .WEnotes a[href^="https://"] {background: none!important;}
 
+.WEnotesMore {margin-left:53px;}
+.WEnotesMore img {display: none; margin-left: 20px; width: 16px; height: 16px;}
+
 .icon-mail-reply, .icon-th-list, .icon-star, .icon-star-empty {
   cursor: pointer;}
 
