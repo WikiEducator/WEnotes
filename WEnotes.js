@@ -317,7 +317,7 @@ var WEnotes = {};
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
       '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
       dt_ago + '</a>';
-    if (!novoting) {
+    if (!novoting && wgUserName) {
       msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
     }
     switch (source) {
