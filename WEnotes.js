@@ -576,7 +576,6 @@ var WEnotes = {};
   }
 
   function WEnotesHandler(event, tag) {
-    console.log('WEnotesHandler', event, tag);
     $.each(wendivs, function (i, v) {
       //debug.log('iterating through wendivs', i, v);
       if (tag && v.tag !== tag) {
