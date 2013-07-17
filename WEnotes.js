@@ -255,7 +255,7 @@ var WEnotes = {};
     case 'feed':
       if (d.truncated) {
         text = text.substring(0, text.lastIndexOf('...')) +
-          '<a class="external text" href="' + d.we_link + '">...</a>';
+          '<a class="external text" href="' + d.we_link + '" target="_wenotes">...</a>';
       }
       break;
     }
@@ -315,7 +315,7 @@ var WEnotes = {};
       msg += d.we_source;
     }
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
-      '" title="' + dt.toUTCString() + '" style="text-decoration: none;">' +
+      '" title="' + dt.toUTCString() + '" style="text-decoration: none;" target="_wenotes">' +
       dt_ago + '</a>';
     if (!novoting && wgUserName) {
       msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
