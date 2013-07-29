@@ -169,6 +169,7 @@ var WEnotes = {};
     switch (source) {
     case 'wikieducator':
       profileURL = 'http://WikiEducator.org/User:' + user;
+      userFullname = userFullname || userName
       break;
     case 'twitter':
       timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
