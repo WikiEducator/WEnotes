@@ -204,11 +204,11 @@ var WEnotes = {};
     // FIXME unfortunately \w is too lenient when livening URLs
     text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
       function(sub, type, scheme, url, word, offset, full) {
-        var moniker;
+        var moniker, parts;
         //debug.log("====\nsub:" + sub + "\ntype:" + type +
         //  "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
         if(!word) return sub; // just punctuation
-        var label = ''; var href = ''; var prefix = '';
+        var label = ''; var href = ''; var prefix = ''; var title = '';
 
         if (word) {
           // special case for WikiEducator user names
@@ -235,6 +235,14 @@ var WEnotes = {};
         }
         if (scheme) { // only urls will have scheme
           label = sub;
+          if (sub.length > 32) {
+            parts = url.split('/', 2);
+            if (parts.length > 1) {
+              title = sub;
+              label = scheme + '://' + parts[0] + '/' +
+                      parts[1].slice(0, 10) + '...';
+            }
+          }
         } else {
           label = word; prefix = type;
         }
@@ -242,7 +250,9 @@ var WEnotes = {};
         if ((type === '!') && (source !== 'identica')) {
           return label;
         }
-        return prefix+'<a href="' + href + '" target="_identica">' + label + '</a>';
+        return prefix + '<a href="' + href + '" ' +
+              (title ? 'title="' + title + '" ' : '') +
+              'target="_wenotes2">' + label + '</a>';
       });
 
     // liven abridged marks
@@ -256,13 +266,15 @@ var WEnotes = {};
     case 'feed':
       if (d.truncated) {
         text = text.substring(0, text.lastIndexOf('...')) +
-          '<a class="external text" href="' + d.we_link + '" target="_wenotes">...</a>';
+          '<a class="external text" href="' + d.we_link +
+          '" target="_wenotes">...</a>';
       }
       break;
     }
 
     // if we don't have a profile img or url, use gravatar if available
-    if (((profileIMG === '')||(profileIMG === '/extensions/WEnotes/missing.gif')) && d.gravatar) {
+    if (((profileIMG === '') ||
+        (profileIMG === '/extensions/WEnotes/missing.gif')) && d.gravatar) {
       profileIMG = 'http://www.gravatar.com/avatar/' + d.gravatar
          + '?s=48&d=identicon';
     }
