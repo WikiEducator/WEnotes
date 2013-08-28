@@ -172,7 +172,7 @@ var WEnotes = {};
       userFullname = userFullname || userName
       break;
     case 'twitter':
-      timeLink = 'http://twitter.com/#!/' + user + '/status/' + d.id_str;
+      timeLink = 'http://twitter.com/' + user + '/status/' + d.id_str;
       profileURL = 'http://twitter.com/' + user;
       break;
     case 'identica':
