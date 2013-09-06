@@ -189,7 +189,7 @@ var WEnotes = {};
       userName = userFullname;
       // old versions of IE don't understand ISO date format
       var dp = d.published.split(/[-T.Z]/);
-      d.created_at = [dp[0], months[dp[1]-1], dp[2], ''].join(' ') + dp[3] + ' GMT';
+      d.created_at = [dp[2], months[dp[1]-1], dp[0], ''].join(' ') + dp[3] + ' +0000';
       break;
     case 'feed':
     case 'moodle':
