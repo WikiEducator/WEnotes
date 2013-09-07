@@ -26,7 +26,7 @@ if ( !Date.prototype.toISOString ) {
       }
       return r;
     }
- 
+
     Date.prototype.toISOString = function() {
       return this.getUTCFullYear() +
         '-' + pad(this.getUTCMonth() + 1) +
@@ -37,7 +37,7 @@ if ( !Date.prototype.toISOString ) {
         '.' + String((this.getUTCMilliseconds()/1000).toFixed(3)).slice(2, 5) +
         'Z';
       };
-  
+
   }());
 }
 
@@ -376,7 +376,7 @@ var WEnotes = {};
         count = wendivs[ix].moreCount + 1,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
-    
+
     $wenmdi.show();
     $wenm.hide();
     if (tag === '_') {
