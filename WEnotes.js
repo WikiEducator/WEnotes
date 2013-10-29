@@ -53,7 +53,7 @@ var WEnotes = {};
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://wikieducator.iriscouch.com/',
+  var couchHost = 'http://s.oerfoundation.org:5984/',
       couchDB = 'mentions',
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
       couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
@@ -345,7 +345,7 @@ var WEnotes = {};
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://wikieducator.iriscouch.com:5984/_utils/document.html?' +
+        '<a href="http://s.oerfoundation.org:5984/_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +
