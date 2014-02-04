@@ -205,7 +205,7 @@ var WEnotes = {};
     text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
       function(sub, type, scheme, url, word, offset, full) {
         var moniker, parts;
-        //debug.log("====\nsub:" + sub + "\ntype:" + type +
+        //console.log("====\nsub:" + sub + "\ntype:" + type +
         //  "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
         if(!word) return sub; // just punctuation
         var label = ''; var href = ''; var prefix = ''; var title = '';
@@ -217,7 +217,7 @@ var WEnotes = {};
           } else {
             moniker = word.split('_'); // behaviour with underscores differs
             if(type === '#') moniker = moniker.join('');
-            else word = moniker = moniker[0].toLowerCase();
+            else word = moniker = word.toLowerCase();
           }
         }
 
