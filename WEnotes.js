@@ -599,8 +599,18 @@ var WEnotes = {};
     return false;
   }
 
+  // return MSIE major version number (or null)
+  function msieVersion() {
+    var m = /MSIE (\d+)/.exec(navigator.userAgent);
+    if (m) {
+      return parseInt(m[1], 10);
+    }
+    return null;
+  }
+
+  var msie = msieVersion();
   $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
-  if ($.browser.msie && parseInt($.browser.version, 10) == 7) {
+  if (msie === 7) {
     $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
   $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
@@ -609,7 +619,7 @@ var WEnotes = {};
     window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
       timeout: 120
     });
-    if ($.browser.msie && parseInt($.browser.version, 10) <= 8) {
+    if (msie <= 8) {
       window.WEFclient.disable('autodisconnect');
     }
   }
