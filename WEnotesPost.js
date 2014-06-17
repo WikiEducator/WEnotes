@@ -37,47 +37,80 @@ function WEnotesPost(id, tag, button, leftmargin) {
     }
   }
 
-  if (wgUserName === null) {
+  function livenForm() {
+    $button.click(function() {
+      $button.attr('disabled', 'disabled');
+      $.ajax({
+        url: weAPI,
+        data: {
+          action: 'wenotes',
+          format: 'json',
+          notag: tag,
+          notext: $text.val()
+        },
+        async: true,
+        type: 'POST',
+        dataType: 'json',
+        success: function(d) {
+          if ('error' in d) {
+            alert('Unable to save submission:\n  ' +
+              d.error.info);
+          }
+          $button.removeAttr('disabled');
+          $text.val('');
+          $counter.text(postLength);
+        }
+      });
+      return false;
+    });
+    $text.bind('keyup', function() {
+      update($(this).val());
+    });
+    $text.bind('change', function() {
+      update($(this).val());
+    });
+    $text.focus(function() {
+      $counter.fadeIn();
+      $text.css('height', 'auto');
+    });
+  }
+
+  function disableForm() {
     $button.attr('disabled', 'disabled');
     $text.attr('disabled', 'disabled');
     $text.attr('rows', '2');
     $counter.html('<a class="plainlinks" href="/Special:UserLogin?returnto=' + wgPageName + '">Login to post</a>');
-    return;
   }
-  $button.click(function() {
-    $button.attr('disabled', 'disabled');
+
+  // check if logged in to the wiki
+  //   either directly where wgUserName is already set
+  //   or in a snapshot, where we do an API call to find out
+  if (wgUserName === null) {
     $.ajax({
       url: weAPI,
       data: {
-        action: 'wenotes',
-        format: 'json',
-        notag: tag,
-        notext: $text.val()
+        action: 'query',
+        meta: 'userinfo',
+        format: 'json'
       },
-      async: true,
       type: 'POST',
       dataType: 'json',
       success: function(d) {
-        if ('error' in d) {
-          alert('Unable to save submission:\n  ' +
-            d.error.info);
+        var userinfo;
+        if (d && d.query && d.query.userinfo) {
+          userinfo = d.query.userinfo;
+          if (! userinfo.hasOwnProperty('anon')) {
+            window.wgUserName = userinfo.name;
+            livenForm();
+            return;
+          }
         }
-        $button.removeAttr('disabled');
-        $text.val('');
-        $counter.text(postLength);
+        disableForm();
       }
     });
-    return false;
-  });
-  $text.bind('keyup', function() {
-    update($(this).val());
-  });
-  $text.bind('change', function() {
-    update($(this).val());
-  });
-  $text.focus(function() {
-    $counter.fadeIn();
-    $text.css('height', 'auto');
-  });
+  } else {
+    // in-wiki case, already know logged in state
+    livenForm();
+  }
 }
 
