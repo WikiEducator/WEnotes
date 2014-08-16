@@ -24,7 +24,7 @@
   },
 
   "devDependencies": {
-    "faye": "0.8.9",
+    "faye": "0.8.9"
   }
 }
 
