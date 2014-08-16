@@ -497,7 +497,7 @@ var WEnotes = {};
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
-              ix +'"><img src="/skins/common/images/Ajax-loader.gif" />' +
+              ix +'"><img src="/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
               '" type="submit" value="More ' + tag + ' notes" />' +
               '</div><br clear="all" />');
