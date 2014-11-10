@@ -53,7 +53,7 @@ var WEnotes = {};
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://s.oerfoundation.org:5984/',
+  var couchHost = 'http://v.oerfoundation.org:5984/',
       couchDB = 'mentions',
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
       couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
@@ -345,7 +345,7 @@ var WEnotes = {};
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://s.oerfoundation.org:5984/_utils/document.html?' +
+        '<a href="http://v.oerfoundation.org:5984/_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -616,7 +616,7 @@ var WEnotes = {};
   $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
-    window.WEFclient = new Faye.Client('http://s.oerfoundation.org:80/faye', {
+    window.WEFclient = new Faye.Client('http://v.oerfoundation.org:80/faye', {
       timeout: 120
     });
     if (msie <= 8) {
