@@ -85,7 +85,7 @@ function WEnotesPost(id, tag, button, leftmargin) {
   // check if logged in to the wiki
   //   either directly where wgUserName is already set
   //   or in a snapshot, where we do an API call to find out
-  if (wgUserName === null) {
+  if (window.wgUserName === null) {
     $.ajax({
       url: weAPI,
       data: {
