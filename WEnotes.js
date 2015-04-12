@@ -80,7 +80,7 @@ var WEnotes = {};
   function like() {
     var mo, cl, tag = '';
     var id = $(this).closest('.WEnote').attr('id');
-    var like = $(this).hasClass('icon-star-empty');
+    var notliked = $(this).hasClass('icon-star-empty');
     cl = $('#' + id).closest('.WEnotes').attr('class');
     mo = /WEnotes-\d+-([^ ]+)/.exec(cl);
     if (mo) {
@@ -99,10 +99,10 @@ var WEnotes = {};
         action: 'wevotes',
         vopid: 'WN' + tag.toLowerCase(),
         vovid: id.slice(5),
-        vovote: (like) ? 1 : 0,
+        vovote: (notliked) ? 1 : 0,
         vopage: wgArticleId
       });
-      if (like) {
+      if (notliked) {
         $(this).removeClass('icon-star-empty')
                .addClass('icon-star')
                .attr('title', 'unfavorite');
