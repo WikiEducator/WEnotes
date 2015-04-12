@@ -8,7 +8,7 @@ function WEnotesPost(id, tag, button, leftmargin) {
       rawPostLength = postLength + 20;
   leftmargin = (leftmargin === '') ? 53 : leftmargin;
   button = (button === '') ? 'Post a WEnote' : unescape(button);
-      
+
   if (id.charAt(0) !== '#') {
     id = '#' + id;
   }

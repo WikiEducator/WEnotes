@@ -497,7 +497,7 @@ var WEnotes = {};
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
-              ix +'"><img src="/skins/common/images/ajax-loader.gif" />' +
+              ix +'"><img src="http://wikieducator.org/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
               '" type="submit" value="More ' + tag + ' notes" />' +
               '</div><br clear="all" />');
@@ -613,7 +613,7 @@ var WEnotes = {};
   if (msie === 7) {
     $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
-  $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
+  $('head').append('<link href="http://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
     window.WEFclient = new Faye.Client('http://v.oerfoundation.org:80/faye', {
