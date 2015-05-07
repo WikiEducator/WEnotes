@@ -53,7 +53,7 @@ var WEnotes = {};
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://v.oerfoundation.org:5984/',
+  var couchHost = 'http://v.oerfoundation.org/DB/',
       couchDB = 'mentions',
       couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
       couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
