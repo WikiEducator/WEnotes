@@ -1,22 +1,15 @@
 {
   "name": "WEnotes",
-  "version": "0.2.0",
-  "description": "microblog aggregator",
+  "version": "0.2.1",
+  "description": "microblog aggregator client",
 
   "homepage": "http://WikiEducator.org/Extension:WEnotes",
-  "repositories": [
+  "repository":
     {
       "type": "git",
       "url": "https://git.gitorious.org/wikieducator/wenotes.git"
-    }
-   ],
-
-  "licenses": [
-    {
-      "type": "Creative Commons Attribution-ShareAlike 3.0 Unported License",
-      "url": "http://creativecommons.org/licenses/by-sa/3.0/"
-    }
-  ],
+    },
+  "license": "CC-BY-SA-3.0",
 
   "author": {
     "name": "Jim Tittsler",
