@@ -140,7 +140,7 @@ var WEnotes = {};
   }
 
   function formatMessage(d, tag, novoting) {
-    var msg, userName, userFullname, i;
+    var msg, userName, userFullname, i, aspect;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
@@ -169,7 +169,7 @@ var WEnotes = {};
     switch (source) {
     case 'wikieducator':
       profileURL = 'http://WikiEducator.org/User:' + user;
-      userFullname = userFullname || userName
+      userFullname = userFullname || userName;
       break;
     case 'twitter':
       timeLink = 'http://twitter.com/' + user + '/status/' + d.id_str;
@@ -194,6 +194,7 @@ var WEnotes = {};
     case 'feed':
     case 'moodle':
     case 'ask':
+    case 'groups':
       timeLink = d.we_link;
       break;
     }
@@ -264,6 +265,7 @@ var WEnotes = {};
     case 'moodle':
     case 'ask':
     case 'feed':
+    case 'groups':
       if (d.truncated) {
         text = text.substring(0, text.lastIndexOf('...')) +
           '<a class="external text" href="' + d.we_link +
@@ -299,6 +301,17 @@ var WEnotes = {};
     if (mo) {
       imgwidth = mo[1];
     }
+    if ((imgwidth > 48) || (imgheight > 48)) {
+      if (imgwidth > imgheight) {
+        aspect = imgheight/imgwidth;
+        imgwidth = Math.min(imgwidth, 48);
+        imgheight = Math.round(imgheight * aspect);
+      } else {
+        aspect = imgwidth/imgheight;
+        imgheight = Math.min(imgheight, 48);
+        imgwidth = Math.round(imgwidth * aspect);
+      }
+    }
     msg += 'src="' + profileIMG +
       '" height=' + imgheight +
       ' width=' + imgwidth + '></a></div><div class="WEnotebody">';
@@ -324,6 +337,8 @@ var WEnotes = {};
     }
     if (d.we_source === 'feed') {
       msg += '<span title="' + d.we_feed + '">blog</span>';
+    } else if (d.we_source === 'groups') {
+      msg += 'groups.oeru';
     } else {
       msg += d.we_source;
     }
