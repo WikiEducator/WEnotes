@@ -195,6 +195,7 @@ var WEnotes = {};
     case 'moodle':
     case 'ask':
     case 'groups':
+    case 'forum':
       timeLink = d.we_link;
       break;
     }
@@ -266,6 +267,7 @@ var WEnotes = {};
     case 'ask':
     case 'feed':
     case 'groups':
+    case 'forum':
       if (d.truncated) {
         text = text.substring(0, text.lastIndexOf('...')) +
           '<a class="external text" href="' + d.we_link +
@@ -339,6 +341,8 @@ var WEnotes = {};
       msg += '<span title="' + d.we_feed + '">blog</span>';
     } else if (d.we_source === 'groups') {
       msg += 'groups.oeru';
+    } else if (d.we_source === 'forum') {
+      msg += 'community.oeru';
     } else {
       msg += d.we_source;
     }
