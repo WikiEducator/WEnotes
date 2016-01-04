@@ -331,8 +331,6 @@ var WEnotes = {};
         for (i=0; i<d.we_tags.length; i++) {
           msg += '#' + d.we_tags[i] + '&nbsp;';
         }
-      } else {
-        msg += '#' + d.we_tag + '&nbsp;';
       }
       msg += '</span>';
       msg += '&nbsp;&nbsp;';
