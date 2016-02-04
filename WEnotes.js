@@ -626,11 +626,11 @@ var WEnotes = {};
   }
 
   var msie = msieVersion();
-  $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
+  $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
   if (msie === 7) {
-    $('head').append('<link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
+    $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
-  $('head').append('<link href="http://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
+  $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
     window.WEFclient = new Faye.Client('http://v.oerfoundation.org:80/faye', {
