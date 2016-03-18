@@ -12,7 +12,7 @@ function WEnotesPostWP(id, tag, button, leftmargin) {
   if (id.charAt(0) !== '#') {
     id = '#' + id;
   }
-  $(id).css('margin', '0px 0px 10px ' + leftmargin +'px').append('<form><textarea rows="4" cols="40" style="width:auto; height: 1.5em; float: left; margin-right: 10px; margin-bottom: 5px;"></textarea><div style="float: left;"><input type="submit" disabled="disabled" value="' + button +  '" /><p class="WEnotesPostCounter" style="color:#999; margin-left: 7px; display: none;">' + postLength + '</p></div></form><br clear="all" />');
+  $(id).css('margin', '0px 0px 10px ' + leftmargin +'px').append('<form><textarea rows="4" cols="40" style="width:auto; height: 1.5em; float: left; margin-right: 10px; margin-bottom: 5px;"></textarea><div style="float: left;"><input type="submit" style="margin-top: 0;" disabled="disabled" value="' + button +  '" /><p class="WEnotesPostCounter" style="color:#999; margin-left: 7px; display: none;">' + postLength + '</p></div></form><br clear="all" />');
   var $counter = $(id + ' p.WEnotesPostCounter');
   var $button = $(id + ' input[type="submit"]');
   var $text = $(id + ' textarea');
