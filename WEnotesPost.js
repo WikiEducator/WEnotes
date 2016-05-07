@@ -1,8 +1,8 @@
 /* WEnotes widget
- * Copyright 2012 Open Education Resource Foundation
+ * Copyright 2012-2016 Open Education Resource Foundation
  * Available under CC-BY license.
  */
-function WEnotesPost(id, tag, button, leftmargin) {
+function WEnotesPost(id, tag, button, leftmargin, anonymous) {
   var weAPI = '/api.php',
       postLength = 300,
       rawPostLength = postLength + 20;
@@ -76,10 +76,11 @@ function WEnotesPost(id, tag, button, leftmargin) {
   }
 
   function disableForm() {
+    var anonmsg = anonymous || '<a class="plainlinks" href="/Special:UserLogin?returnto=' + wgPageName + '">Login to post</a>';
     $button.attr('disabled', 'disabled');
     $text.attr('disabled', 'disabled');
     $text.attr('rows', '2');
-    $counter.html('<a class="plainlinks" href="/Special:UserLogin?returnto=' + wgPageName + '">Login to post</a>');
+    $counter.html(anonmsg);
   }
 
   // check if logged in to the wiki
