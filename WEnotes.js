@@ -144,13 +144,13 @@ var WEnotes = {};
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
-      twitter: 'http://twitter.com/',
+      twitter: 'https://twitter.com/',
       identica: 'http://identi.ca/',
       wikieducator: 'http://WikiEducator.org/User:',
       'g+': '#'
     };
     var sourceTag = {
-      twitter: 'http://twitter.com/#!/search?q=%23',
+      twitter: 'https://twitter.com/#!/search?q=%23',
       identica: 'http://identi.ca/tag/',
       wikieducator: 'http://WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
@@ -161,7 +161,7 @@ var WEnotes = {};
     var text = d.text;
     var timeLink = '#';
     var profileURL = d.profile_url || '#';
-    var profileIMG = user.profile_image_url || d.profile_image_url ||
+    var profileIMG = user.profile_image_url || d.profile_image_url_https || d.profile_image_url ||
         '/extensions/WEnotes/missing.gif';
     userName = user.screen_name || user;
     userFullname = user.name || d.from_user_name;
@@ -172,18 +172,18 @@ var WEnotes = {};
       userFullname = userFullname || userName;
       break;
     case 'twitter':
-      timeLink = 'http://twitter.com/' + user + '/status/' + d.id_str;
-      profileURL = 'http://twitter.com/' + user;
+      timeLink = 'https://twitter.com/' + user + '/status/' + d.id_str;
+      profileURL = 'https://twitter.com/' + user;
       break;
     case 'identica':
       timeLink = 'http://identi.ca/notice/' + d.id;
       profileURL = user.statusnet_profile_url;
       break;
     case 'g+':
-      timeLink = d.url.replace('https://', 'http://');
+      timeLink = d.url;
       text = d.title;
-      profileURL = d.actor.url.replace('https://', 'http://');
-      profileIMG = d.actor.image.url.replace('https://', 'http://');
+      profileURL = d.actor.url;
+      profileIMG = d.actor.image.url;
       userFullname = d.actor.displayName;
       user = '';
       userName = userFullname;
