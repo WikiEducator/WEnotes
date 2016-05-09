@@ -281,11 +281,11 @@ var WEnotes = {};
     // if we don't have a profile img or url, use gravatar if available
     if (((profileIMG === '') ||
         (profileIMG === '/extensions/WEnotes/missing.gif')) && d.gravatar) {
-      profileIMG = 'http://www.gravatar.com/avatar/' + d.gravatar
+      profileIMG = 'https://www.gravatar.com/avatar/' + d.gravatar
          + '?s=48&d=identicon';
     }
     if ((profileURL === '') && d.gravatar) {
-      profileURL = 'http://www.gravatar.com/' + d.gravatar;
+      profileURL = 'https://www.gravatar.com/' + d.gravatar;
     }
     msg = '<div id="WEitf' + d._id + '" class="WEnote">';
     msg += '<div class="WEnotepic"><a href="' +
