@@ -16,7 +16,7 @@ require_once('sag/src/Sag.php');
 $wgExtensionCredits['parserhook'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'WEnotes',
-	'version'        => '0.6.2',
+	'version'        => '0.7.0',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -25,6 +25,29 @@ $wgExtensionCredits['parserhook'][] = array(
 $wgAPIModules['wenotes'] = 'APIWEnotes';
 
 class APIWEnotes extends ApiQueryBase {
+	// return an array of allowed tags
+	private function getTags() {
+		global $wgWEnotesTagsNS, $wgWEnotesTagsTitle, $wgWEnotesTags;
+		$title = Title::makeTitle( $wgWEnotesTagsNS, $wgWEnotesTagsTitle );
+		$wikiPage = new WikiPage( $title );
+		$content = $wikiPage->getContent( Revision::RAW );
+		if ( isset($wgWEnotesTagsNS ) && isset( $wgWEnotesTagsTitle ) && ( $content === null ) ) {
+			error_log( "WEnotes getTags page ($wgWEnotesTagsNS:$wgWEnotesTagsTitle) is unavailable");
+		}
+		if ( $content !== null ) {
+			$text = ContentHandler::getContentText( $content );
+			$tags = explode( "\n", $text );
+			$tags = array_map( 'trim', $tags );
+			$tags = array_filter( $tags, function ( $e ) {
+				return ( $e !== '' ) && !preg_match( '/\s*[#;]/', $e );
+			} );
+			return $tags;
+		} elseif ( isset( $wgWEnotesTags ) && is_array( $wgWEnotesTags ) ) {
+			return $wgWEnotesTags;
+		}
+		return array();
+	}
+
 	public function __construct( $query, $moduleName ) {
 		parent :: __construct( $query, $moduleName, 'no' );
 	}
@@ -33,7 +56,7 @@ class APIWEnotes extends ApiQueryBase {
 		global $wgUser, $wgServer;
 		global $wgWEnotesHost, $wgWEnotesPort;
 		global $wgWEnotesDB, $wgWEnotesAvatarsDB;
-		global $wgWEnotesUser, $wgWEnotesPasswd, $wgWEnotesTags;
+		global $wgWEnotesUser, $wgWEnotesPasswd;
 		global $wgWEnotesPostLimit;
 		$id = NULL;
 		$user = $wgUser->getId();
@@ -56,7 +79,7 @@ class APIWEnotes extends ApiQueryBase {
 					'missingtag');
 			}
 			$tag = strtolower($params['tag']);
-			if (!in_array($tag, $wgWEnotesTags)) {
+			if (!in_array($tag, $this->getTags())) {
 				$this->dieUsage('unrecognized tag',
 					'badtag');
 			}
