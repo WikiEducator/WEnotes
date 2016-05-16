@@ -199,6 +199,9 @@ var WEnotes = {};
     case 'forums':
       timeLink = d.we_link;
       break;
+    case 'chat':
+      timeLink = d.url;
+      break;
     }
 
     // This text markup routine derived from one
