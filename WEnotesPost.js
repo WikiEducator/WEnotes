@@ -2,6 +2,8 @@
  * Copyright 2012-2016 Open Education Resource Foundation
  * Available under CC-BY license.
  */
+/* global wgPageName */
+/* exported WEnotesPost */
 function WEnotesPost(id, tag, button, leftmargin, anonymous) {
   var weAPI = '/api.php',
       postLength = 300,
@@ -18,7 +20,7 @@ function WEnotesPost(id, tag, button, leftmargin, anonymous) {
   var $text = $(id + ' textarea');
 
   function update(t) {
-    var mt = t.replace(/http:\/\/([^ ]+)/g, function (target, p1) {
+    var mt = t.replace(/http:\/\/([^ ]+)/g, function (target) {
       return (target.length > 19) ? 'http://xxx.xx/xxxxx' : target;
     });
     var l = mt.length;
@@ -114,4 +116,3 @@ function WEnotesPost(id, tag, button, leftmargin, anonymous) {
     livenForm();
   }
 }
-

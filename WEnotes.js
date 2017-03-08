@@ -1,3 +1,5 @@
+/* global wgUserName, wgArticleId, Faye */
+/* exported WEnotes */
 /* IE console shim */
 if ( ! window.console ) {
   (function() {
@@ -117,7 +119,7 @@ var WEnotes = {};
     return false;
   }
 
-  function getFaves(tag, ids) {
+  function getFaves(tag) {
     if (tag === '_') return;
     tag = tag.toLowerCase();
     $.ajax({
@@ -209,7 +211,7 @@ var WEnotes = {};
     // see http://kentbrewster.com/identica-badge for info
     // FIXME unfortunately \w is too lenient when livening URLs
     text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
-      function(sub, type, scheme, url, word, offset, full) {
+      function(sub, type, scheme, url, word) {
         var moniker, parts;
         //console.log("====\nsub:" + sub + "\ntype:" + type +
         //  "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
@@ -433,7 +435,7 @@ var WEnotes = {};
         },
         success: function(data) {
           //debug.log(data);
-          var i, d, id,
+          var i, d,
               mid = '#WEnotesMoreDiv' + ix,
               rows = data.rows;
           // FIXME ignore first row which is a duplicate of current "first"
@@ -445,7 +447,6 @@ var WEnotes = {};
           }
           for (i=1; i < rows.length; i++) {
             d = rows[i].doc;
-            id = d.id;
             if (d.we_timestamp > wendivs[ix].last) {
               wendivs[ix].last = d.we_timestamp;
             }
@@ -545,7 +546,7 @@ var WEnotes = {};
             $(did + ' > div:last').remove();
           }
           */
-          getFaves(tag, ids);
+          getFaves(tag);
         }
     });
   }
@@ -649,7 +650,7 @@ var WEnotes = {};
   }
   var client = window.WEFclient;
   var subs = [];
-  $('div.WEnotes').each(function(i) {
+  $('div.WEnotes').each(function() {
     var $thisd = $(this);
     var classes = $(this).attr('class').split(/\s+/);
     $.each(classes, function(i, v) {
@@ -677,7 +678,7 @@ var WEnotes = {};
   });
   $('div.WEnotes,div.WEnotesList').on('click', '.icon-star, .icon-star-empty', like)
               .on('click', '.icon-mail-reply, .icon-th-list', windowConv)
-              .on('click', 'a.WEnd', function(event) {
+              .on('click', 'a.WEnd', function() {
     var id = $(this).attr('id').split('_')[1];
     $.ajax({
       url: weAPI,
