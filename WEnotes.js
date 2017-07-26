@@ -51,14 +51,17 @@ if ( !Date.prototype.toISOString ) {
 // variables made public to simplify debugging/monitoring
 var wendivs = [];
 var WEnotes = {};
+var protocol = window.location.protocol + '//';
+
+//alert('protocol = ' + protocol);
 
 (function () {
 
   // scheme, host:port
-  var couchHost = 'http://v.oerfoundation.org/DB/',
+  var couchHost = 'couch.oerfoundation.org/',
       couchDB = 'mentions',
-      couchURL = couchHost + couchDB + '/_design/messages/_view/tag_time?',
-      couchURLall = couchHost + couchDB + '/_design/messages/_view/time?',
+      couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
+      couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time?',
       weAPI = '/api.php';
 
   function API(data, success, failure) {
@@ -371,7 +374,7 @@ var WEnotes = {};
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="http://v.oerfoundation.org:5984/_utils/document.html?' +
+        '<a href="' + protocol + 'couch.oerfoundation.org/_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -641,7 +644,7 @@ var WEnotes = {};
   $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
-    window.WEFclient = new Faye.Client('http://v.oerfoundation.org:80/faye', {
+    window.WEFclient = new Faye.Client(protocol + 'fay.oerfoundation.org/faye', {
       timeout: 120
     });
     if (msie <= 8) {
