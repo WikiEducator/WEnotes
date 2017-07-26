@@ -151,13 +151,13 @@ var protocol = window.location.protocol + '//';
     var sourceProfile = {
       twitter: 'https://twitter.com/',
       identica: 'http://identi.ca/',
-      wikieducator: 'http://WikiEducator.org/User:',
+      wikieducator: protocol + 'WikiEducator.org/User:',
       'g+': '#'
     };
     var sourceTag = {
       twitter: 'https://twitter.com/#!/search?q=%23',
       identica: 'http://identi.ca/tag/',
-      wikieducator: 'http://WikiEducator.org/',
+      wikieducator: protocol + 'WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
     };
     var source = d.we_source;
@@ -173,7 +173,7 @@ var protocol = window.location.protocol + '//';
 
     switch (source) {
     case 'wikieducator':
-      profileURL = 'http://WikiEducator.org/User:' + user;
+      profileURL = protocol + 'WikiEducator.org/User:' + user;
       userFullname = userFullname || userName;
       break;
     case 'twitter':
@@ -310,6 +310,10 @@ var protocol = window.location.protocol + '//';
     var imgwidth = (d.profile_image_width) ? d.profile_image_width : 48;
     var imgheight = (d.profile_image_height) ? d.profile_image_height : 48;
     var mo = profileIMG.match(/http:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
+    //var mo = profileIMG.match(/(http|https):\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
+    /*if (protocol == 'https://') {
+      mo = mo.replace('http:','https:');
+    }*/
     if (mo) {
       imgwidth = mo[1];
     }
@@ -525,7 +529,7 @@ var protocol = window.location.protocol + '//';
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
-              ix +'"><img src="http://wikieducator.org/skins/common/images/ajax-loader.gif" />' +
+              ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
               '" type="submit" value="More ' + tag + ' notes" />' +
               '</div><br clear="all" />');
