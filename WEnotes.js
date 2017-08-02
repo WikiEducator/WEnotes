@@ -648,7 +648,7 @@ var protocol = window.location.protocol + '//';
   $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
-    window.WEFclient = new Faye.Client(protocol + 'fay.oerfoundation.org/faye', {
+    window.WEFclient = new Faye.Client(protocol + 'faye.oerfoundation.org/faye/', {
       timeout: 120
     });
     if (msie <= 8) {
