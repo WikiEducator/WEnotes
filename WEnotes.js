@@ -151,12 +151,14 @@ var protocol = window.location.protocol + '//';
     var sourceProfile = {
       twitter: 'https://twitter.com/',
       identica: 'http://identi.ca/',
+      mastodon: 'https://mastodon.oeru.org/',
       wikieducator: protocol + 'WikiEducator.org/User:',
       'g+': '#'
     };
     var sourceTag = {
       twitter: 'https://twitter.com/#!/search?q=%23',
       identica: 'http://identi.ca/tag/',
+      mastodon: 'https://mastodon.oeru.org/api/v1/timelines/tag/',
       wikieducator: protocol + 'WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
     };
@@ -184,6 +186,9 @@ var protocol = window.location.protocol + '//';
       timeLink = 'http://identi.ca/notice/' + d.id;
       profileURL = user.statusnet_profile_url;
       break;
+    case 'mastodon':
+      timeLink = 'https://mastodon.oeru.org/@' + user + d.id;
+      profileURL = 'https://mastodon.oeru.org/@' + user;
     case 'g+':
       timeLink = d.url;
       text = d.title;
@@ -269,6 +274,7 @@ var protocol = window.location.protocol + '//';
     // liven abridged marks
     switch (source) {
     case 'identica':
+    case 'mastodon':
     case 'g+':
       text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
       break;
@@ -357,6 +363,8 @@ var protocol = window.location.protocol + '//';
       msg += 'community.oeru';
     } else if (d.we_source === 'forums') {
       msg += 'forums.oeru';
+    } else if (d.we_source === 'mastodon') {
+      msg += 'mastodon.oeru';
     } else {
       msg += d.we_source;
     }
