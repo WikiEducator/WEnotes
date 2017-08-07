@@ -52,15 +52,14 @@ if ( !Date.prototype.toISOString ) {
 var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
-
+// hard coded locations of things
+var fayeURL = 'faye.oerfoundation.org/faye/';
+// scheme, host:port
+var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //alert('protocol = ' + protocol);
 
 (function () {
-
-  // scheme, host:port
-  var couchHost = 'couch.oerfoundation.org/',
-      couchDB = 'mentions',
-      couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
+  var couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
       couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time?',
       weAPI = '/api.php';
 
@@ -189,6 +188,7 @@ var protocol = window.location.protocol + '//';
     case 'mastodon':
       timeLink = 'https://mastodon.oeru.org/@' + user + d.id;
       profileURL = 'https://mastodon.oeru.org/@' + user;
+      break;
     case 'g+':
       timeLink = d.url;
       text = d.title;
@@ -609,6 +609,7 @@ var protocol = window.location.protocol + '//';
     });
   }
 
+  // FIXME: describe what this method really does...
   function newPost(i, message) {
     // ignore design updates
     if (message._id.charAt(0) === '_') {
@@ -656,33 +657,42 @@ var protocol = window.location.protocol + '//';
   $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
   if (!window.WEFclient) {
-    window.WEFclient = new Faye.Client(protocol + 'faye.oerfoundation.org/faye/', {
+    window.WEFclient = new Faye.Client(protocol + fayeURL, {
       timeout: 120
     });
     if (msie <= 8) {
       window.WEFclient.disable('autodisconnect');
     }
   }
+  // rename this for brevity
   var client = window.WEFclient;
+  // to hold individual subscriptions
   var subs = [];
+  // for each WENotes instance on the page
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
+    // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101
     var classes = $(this).attr('class').split(/\s+/);
+    // for each class, get useful info out of the class name
+    // in the example above, 20 is the 'count' of messages to show,
+    // and lida101 is the tag
     $.each(classes, function(i, v) {
       if (v.indexOf('WEnotes-') === 0) {
         var tag;
         var args = v.split('-', 3);
         if (args.length === 3) {
           tag = args[2];
+          // add each class' details to a list for future reference
           wendivs.push({
             $d: $thisd,
-            count: args[1],
-            tag: args[2],
+            count: args[1], // how many of this to show
+            tag: args[2], // from which tag
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
-            moreCount: 20
+            moreCount: 20  // how many more to show if the user clicks "show more"
           });
 
+          // actually subscribe to the Faye services for the relevant combo
           subs[i] = client.subscribe('/WEnotes/' +
                     ((tag === '_') ? '*' : tag.toLowerCase()), function(msg) {
             newPost(i, msg);
