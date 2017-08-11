@@ -12,7 +12,7 @@
 $(function() {
   var cs = $('head>link[href="/extensions/WEnotes/WEnotes.css"]');
   if (cs.length == 0) {
-    $.getScript('/extensions/WEnotes/WEnotes-min.js', function() {
+    $.getScript('/extensions/WEnotes/WEnotesClient.js', function() {
       window.WEnotes.top('#WEnotesTop<!--{$WEnotesTop}-->', '<!--{$tag|escape:'quotes'}-->', '<!--{$cnt|escape:'quotes'}-->');
     });
   } else {

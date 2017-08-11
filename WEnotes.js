@@ -53,9 +53,13 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+//var fayeURL = 'faye.wenotes.oeru.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
 //alert('protocol = ' + protocol);
 
 (function () {
@@ -386,7 +390,7 @@ var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="' + protocol + 'couch.oerfoundation.org/_utils/document.html?' +
+        '<a href="' + protocol + couchHost + '/_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +

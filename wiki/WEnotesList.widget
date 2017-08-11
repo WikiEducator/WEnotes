@@ -11,7 +11,7 @@
 $(function() {
   var cs = $('head>link[href="/extensions/WEnotes/WEnotes.css"]');
   if (cs.length == 0) {
-    $.getScript('/extensions/WEnotes/WEnotes-min.js', function() {
+    $.getScript('/extensions/WEnotes/WEnotesClient.js', function() {
       window.WEnotes.list('#WEnotesList<!--{$WEnotesList}-->', '<!--{$ids|escape:'quotes'}-->');
     });
   } else {
