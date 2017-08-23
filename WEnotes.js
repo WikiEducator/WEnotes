@@ -57,10 +57,12 @@ var protocol = window.location.protocol + '//';
 //var fayeURL = 'faye.wenotes.oeru.org/faye/';
 var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
+// include trailing / on URL...
 //var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
-var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 //alert('protocol = ' + protocol);
+
 
 (function () {
   var couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
@@ -72,6 +74,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
     data.format || (data.format = 'json');
     return $.ajax({
       url: window.wgServer + weAPI,
+      contentType: "application/json",
       type: 'POST',
       data: data,
       success: success,
@@ -150,33 +153,47 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
   function formatMessage(d, tag, novoting) {
     var msg, userName, userFullname, i, aspect;
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      'Jul', 'Aug', 'Sep', 'Ocat', 'Nov', 'Dec'];
     var sourceProfile = {
-      twitter: 'https://twitter.com/',
+      bookmarks: 'https://bookmarks.oeru.org/',
+      hypothesis: 'https://hypothes.is/',
       identica: 'http://identi.ca/',
       mastodon: 'https://mastodon.oeru.org/',
+      twitter: 'https://twitter.com/',
       wikieducator: protocol + 'WikiEducator.org/User:',
       'g+': '#'
     };
     var sourceTag = {
-      twitter: 'https://twitter.com/#!/search?q=%23',
+      bookmarks: 'https://bookmarks.oeru.org/tags.php/',
+      hypothesis: 'https://hypothes.is/earch?q=tag%3A',
       identica: 'http://identi.ca/tag/',
       mastodon: 'https://mastodon.oeru.org/api/v1/timelines/tag/',
+      twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
     };
     var source = d.we_source;
-    var user = d.user || d.from_user || d.actor.id;
+    var user = d.user || d.from_user;
 
     var text = d.text;
     var timeLink = '#';
     var profileURL = d.profile_url || '#';
     var profileIMG = user.profile_image_url || d.profile_image_url_https || d.profile_image_url ||
         '/extensions/WEnotes/missing.gif';
-    userName = user.screen_name || user;
+    userName = user.screen_name || user.username || user;
     userFullname = user.name || d.from_user_name;
 
     switch (source) {
+    case 'bookmarks':
+      timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
+      profileURL = user.profile_url;
+      profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
+      break;
+    case 'hypothesis':
+      profileURL = user.profile_url;
+      profileIMG = 'https://assets.oeru.org/hypothesis.png';
+      console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
+      console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
     case 'wikieducator':
       profileURL = protocol + 'WikiEducator.org/User:' + user;
       userFullname = userFullname || userName;
@@ -190,8 +207,11 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
       profileURL = user.statusnet_profile_url;
       break;
     case 'mastodon':
-      timeLink = 'https://mastodon.oeru.org/@' + user + d.id;
-      profileURL = 'https://mastodon.oeru.org/@' + user;
+      timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
+      profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
+      console.log('timeLink = ' + JSON.stringify(timeLink));
+      console.log('profileURL = ' + JSON.stringify(profileURL));
+      console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
       break;
     case 'g+':
       timeLink = d.url;
@@ -223,10 +243,15 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
     // see http://kentbrewster.com/identica-badge for info
     // FIXME unfortunately \w is too lenient when livening URLs
     text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
+    //text = text.replace(/((http|https):\/\/|\!|@|#)(([&@#\/%?=~_|!:,.;]+)?[^\s]*)/g,
       function(sub, type, scheme, url, word) {
         var moniker, parts;
+        // insights for this next regex: http://www.regular-expressions.info/possessive.html
+        var regex = /[.!?;,'")]+$/;
+        url = url.replace(regex, '');
+        sub = sub.replace(regex, '');
         //console.log("====\nsub:" + sub + "\ntype:" + type +
-        //  "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
+         // "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
         if(!word) return sub; // just punctuation
         var label = ''; var href = ''; var prefix = ''; var title = '';
 
@@ -279,6 +304,8 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
     switch (source) {
     case 'identica':
     case 'mastodon':
+    case 'bookmarks':
+    case 'hypothesis':
     case 'g+':
       text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
       break;
@@ -369,6 +396,8 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
       msg += 'forums.oeru';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
+    } else if (d.we_source === 'hypothesis') {
+      msg += 'hypothes.is';
     } else {
       msg += d.we_source;
     }
@@ -390,7 +419,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="' + protocol + couchHost + '/_utils/document.html?' +
+        '<a href="' + protocol + couchHost + '_utils/document.html?' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -404,12 +433,13 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
   function makeCouchqs(options) {
     var i,
         optionList = [];
-
+    console.log("options = " + JSON.stringify(options));
     for (i in options) {
       if (options.hasOwnProperty(i)) {
         optionList.push(i + '=' + encodeURIComponent(options[i]));
       }
     }
+    console.log("OptionList = " + JSON.stringify(optionList.join('&')));
     return optionList.join('&');
   }
 
@@ -444,6 +474,10 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
         limit: count
       };
     }
+
+    console.log("url1 = " + url);
+    console.log("options = " + options);
+
     $.ajax({
         url: url + makeCouchqs(options),
         cache: false,
@@ -453,7 +487,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
           $wenm.show();
         },
         success: function(data) {
-          //debug.log(data);
+          console.log(JSON.stringify(data));
           var i, d,
               mid = '#WEnotesMoreDiv' + ix,
               rows = data.rows;
@@ -517,17 +551,19 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
         limit: count
       };
     }
-
+    console.log("url2 = " + url);
     $.ajax({
         url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
         failure: function() {
+          console.log("oops...");
           // hope things are better later
           dx.timer = setTimeout(function() {$('div.WEnotes:first')
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
+          //console.log("data = " + JSON.stringify(data));
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -664,6 +700,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
     window.WEFclient = new Faye.Client(protocol + fayeURL, {
       timeout: 120
     });
+    console.log("got WEF client!");
     if (msie <= 8) {
       window.WEFclient.disable('autodisconnect');
     }
@@ -719,6 +756,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
         format: 'json'
       },
       success: function() {
+        console.log('deleting mention designated by ' + id);
       },
       failure: function() {
         alert('unable to delete');
