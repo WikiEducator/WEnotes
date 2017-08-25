@@ -61,6 +61,7 @@ var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 //var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
 var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
 //alert('protocol = ' + protocol);
 
 
@@ -152,8 +153,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
   function formatMessage(d, tag, novoting) {
     var msg, userName, userFullname, i, aspect;
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Ocat', 'Nov', 'Dec'];
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
       bookmarks: 'https://bookmarks.oeru.org/',
       hypothesis: 'https://hypothes.is/',
@@ -184,58 +184,59 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     userFullname = user.name || d.from_user_name;
 
     switch (source) {
-    case 'bookmarks':
-      timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
-      profileURL = user.profile_url;
-      profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
-      break;
-    case 'hypothesis':
-      profileURL = user.profile_url;
-      profileIMG = 'https://assets.oeru.org/hypothesis.png';
-      console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
-      console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
-    case 'wikieducator':
-      profileURL = protocol + 'WikiEducator.org/User:' + user;
-      userFullname = userFullname || userName;
-      break;
-    case 'twitter':
-      timeLink = 'https://twitter.com/' + user + '/status/' + d.id_str;
-      profileURL = 'https://twitter.com/' + user;
-      break;
-    case 'identica':
-      timeLink = 'http://identi.ca/notice/' + d.id;
-      profileURL = user.statusnet_profile_url;
-      break;
-    case 'mastodon':
-      timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
-      profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
-      console.log('timeLink = ' + JSON.stringify(timeLink));
-      console.log('profileURL = ' + JSON.stringify(profileURL));
-      console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
-      break;
-    case 'g+':
-      timeLink = d.url;
-      text = d.title;
-      profileURL = d.actor.url;
-      profileIMG = d.actor.image.url;
-      userFullname = d.actor.displayName;
-      user = '';
-      userName = userFullname;
-      // old versions of IE don't understand ISO date format
-      var dp = d.published.split(/[-T.Z]/);
-      d.created_at = [dp[2], months[dp[1]-1], dp[0], ''].join(' ') + dp[3] + ' +0000';
-      break;
-    case 'feed':
-    case 'moodle':
-    case 'ask':
-    case 'groups':
-    case 'community':
-    case 'forums':
-      timeLink = d.we_link;
-      break;
-    case 'chat':
-      timeLink = d.url;
-      break;
+      case 'bookmarks':
+        timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
+        profileURL = user.profile_url;
+        profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
+        break;
+      case 'hypothesis':
+        profileURL = user.profile_url;
+        profileIMG = 'https://assets.oeru.org/hypothesis.png';
+        console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
+        console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
+        break;
+      case 'wikieducator':
+        profileURL = protocol + 'WikiEducator.org/User:' + user;
+        userFullname = userFullname || userName;
+        break;
+      case 'twitter':
+        timeLink = 'https://twitter.com/' + user + '/status/' + d.id_str;
+        profileURL = 'https://twitter.com/' + user;
+        break;
+      case 'identica':
+        timeLink = 'http://identi.ca/notice/' + d.id;
+        profileURL = user.statusnet_profile_url;
+        break;
+      case 'mastodon':
+        timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
+        profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
+        console.log('timeLink = ' + JSON.stringify(timeLink));
+        console.log('profileURL = ' + JSON.stringify(profileURL));
+        console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
+        break;
+      case 'g+':
+        timeLink = d.url;
+        text = d.title;
+        profileURL = d.actor.url;
+        profileIMG = d.actor.image.url;
+        userFullname = d.actor.displayName;
+        user = '';
+        userName = userFullname;
+        // old versions of IE don't understand ISO date format
+        var dp = d.published.split(/[-T.Z]/);
+        d.created_at = [dp[2], months[dp[1]-1], dp[0], ''].join(' ') + dp[3] + ' +0000';
+        break;
+      case 'feed':
+      case 'moodle':
+      case 'ask':
+      case 'groups':
+      case 'community':
+      case 'forums':
+        timeLink = d.we_link;
+        break;
+      case 'chat':
+        timeLink = d.url;
+        break;
     }
 
     // This text markup routine derived from one
@@ -268,9 +269,11 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
         switch(type) {
           case 'http://': case 'https://': // html links
-            href = scheme + '://' + url; break;
+            href = scheme + '://' + url; 
+            break;
           case '@': // link users
-            href = sourceProfile[source] + moniker; break;
+            href = sourceProfile[source] + moniker; 
+            break;
           case '!': // link groups
             href = 'http://identi.ca/group/' + moniker;
             break;
@@ -396,8 +399,6 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
       msg += 'forums.oeru';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
-    } else if (d.we_source === 'hypothesis') {
-      msg += 'hypothes.is';
     } else {
       msg += d.we_source;
     }
@@ -408,13 +409,16 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
       msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
     }
     switch (source) {
-    case 'twitter':
-      // if the message is too old, don't show the conversation links
-      if (((new Date().getTime() - dt.getTime())/86400000) > 5.0) break;
-      // fall through to show links
-    case 'g+':
-      msg += '&nbsp;&nbsp;&nbsp;<i title="reply" class="icon-mail-reply"></i>';
-      msg += '&nbsp;&nbsp;&nbsp;<i title="thread" class="icon-th-list"></i>';
+       case 'twitter':
+           // if the message is too old, don't show the conversation links
+           if (((new Date().getTime() - dt.getTime())/86400000) > 5.0) {
+               break;
+            }
+           // fall through to show links
+       case 'g+':
+           msg += '&nbsp;&nbsp;&nbsp;<i title="reply" class="icon-mail-reply"></i>';
+           msg += '&nbsp;&nbsp;&nbsp;<i title="thread" class="icon-th-list"></i>';
+           break;
     }
     msg += '&nbsp;<span class="wevtct"></span>';
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
@@ -456,6 +460,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     $wenm.hide();
     if (tag === '_') {
       url = couchURLall;
+      console.log('startkey: ' + wendivs[ix].first);
       options= {
         startkey: '"' + wendivs[ix].first +'"',
         endkey: '"2011-01-01T00:00:00.000Z"',
@@ -563,7 +568,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
-          //console.log("data = " + JSON.stringify(data));
+          console.log("data = " + JSON.stringify(data));
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -724,6 +729,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
         if (args.length === 3) {
           tag = args[2];
           // add each class' details to a list for future reference
+          console.log('We are here!');
           wendivs.push({
             $d: $thisd,
             count: args[1], // how many of this to show
