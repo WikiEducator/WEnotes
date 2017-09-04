@@ -63,19 +63,20 @@ var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
 //alert('protocol = ' + protocol);
-
+//checkJSONp();
+var msg_counter = [];
 
 (function () {
   var couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
-      couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time?',
+      couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time_unique?',
       weAPI = '/api.php';
+
 
   function API(data, success, failure) {
     data.action || (data.action = 'query');
     data.format || (data.format = 'json');
     return $.ajax({
       url: window.wgServer + weAPI,
-      contentType: "application/json",
       type: 'POST',
       data: data,
       success: success,
@@ -195,6 +196,11 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
         console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
         console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
         break;
+      case 'medium':
+        profileURL = user.profile_url;
+        profileIMG = 'https://assets.oeru.org/medium.png';
+        console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
+        break;
       case 'wikieducator':
         profileURL = protocol + 'WikiEducator.org/User:' + user;
         userFullname = userFullname || userName;
@@ -310,6 +316,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     case 'bookmarks':
     case 'hypothesis':
     case 'g+':
+    case 'medium':
       text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
       break;
     case 'moodle':
@@ -381,6 +388,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     msg += '<br /><span class="WEnotesub">';
     if (tag === '_') {
       if (d.we_tags) {
+        //console.log('%%% type = ' + d.we_source + ' num tags = ' + d.we_tags.length);
         msg += '<span class="WEtags">';
         for (i=0; i<d.we_tags.length; i++) {
           msg += '#' + d.we_tags[i] + '&nbsp;';
@@ -399,6 +407,10 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
       msg += 'forums.oeru';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
+    } else if (d.we_source === 'hypothesis') {
+      msg += 'hypothes.is';
+      console.log("*** id = " + d.id);
+      console.log("dt = " + dt + ", dt_ago = " + dt_ago);
     } else {
       msg += d.we_source;
     }
@@ -421,9 +433,11 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
            break;
     }
     msg += '&nbsp;<span class="wevtct"></span>';
+    // add the "sysop-only" links to view the mention in the db, or delete it
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="' + protocol + couchHost + '_utils/document.html?' +
+        //'<a href="' + protocol + couchHost + '_utils/document.html?' +
+        '<a href="' + protocol + couchHost + '_utils/#database/' +
         couchDB + '/' +
         d._id + '" target="wenotesdb">db</a>';
       msg += '&nbsp;&nbsp;&nbsp;' +
@@ -437,17 +451,18 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
   function makeCouchqs(options) {
     var i,
         optionList = [];
-    console.log("options = " + JSON.stringify(options));
+    //console.log("options = " + JSON.stringify(options));
     for (i in options) {
       if (options.hasOwnProperty(i)) {
         optionList.push(i + '=' + encodeURIComponent(options[i]));
       }
     }
-    console.log("OptionList = " + JSON.stringify(optionList.join('&')));
+    //console.log("OptionList = " + JSON.stringify(optionList.join('&')));
     return optionList.join('&');
   }
 
   function getMore(event) {
+    console.log('in getMore');
     var options, url;
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
@@ -460,7 +475,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     $wenm.hide();
     if (tag === '_') {
       url = couchURLall;
-      console.log('startkey: ' + wendivs[ix].first);
+      //console.log('startkey: ' + wendivs[ix].first);
       options= {
         startkey: '"' + wendivs[ix].first +'"',
         endkey: '"2011-01-01T00:00:00.000Z"',
@@ -480,8 +495,8 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
       };
     }
 
-    console.log("url1 = " + url);
-    console.log("options = " + options);
+    //console.log("url1 = " + url);
+    //console.log("options = " + options);
 
     $.ajax({
         url: url + makeCouchqs(options),
@@ -492,7 +507,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
           $wenm.show();
         },
         success: function(data) {
-          console.log(JSON.stringify(data));
+          //console.log(JSON.stringify(data));
           var i, d,
               mid = '#WEnotesMoreDiv' + ix,
               rows = data.rows;
@@ -530,7 +545,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     var tag = dx.tag || 'wikieducator';
     var taglc = tag.toLowerCase();
     var count = dx.count || 20;
-    // exploits knowing the milliseconds of all we_timestamp = .000
+    // exploits knowing the milliseconds of all we_timestamp = .000i
     var lastplus = dx.last.slice(0, -2) + '1Z';
     if (dx.timer) {
       clearTimeout(dx.timer);
@@ -556,19 +571,17 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
         limit: count
       };
     }
-    console.log("url2 = " + url);
     $.ajax({
         url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
         failure: function() {
-          console.log("oops...");
           // hope things are better later
           dx.timer = setTimeout(function() {$('div.WEnotes:first')
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
-          console.log("data = " + JSON.stringify(data));
+          //console.log("data = " + JSON.stringify(data));
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -590,6 +603,16 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
           }
           for (i=0; i<rows.length; i++) {
             var d = rows[i].doc;
+            if (typeof msg_counter[d.id] === 'undefined') { 
+               msg_counter[d.id] = 0;
+            }
+            msg_counter[d.id] = msg_counter[d.id] + 1;
+            console.log('looking at id = ' + d.id + ' counter = ' + msg_counter[d.id]);
+            // we've seen this message before, don't show it again!
+            if (msg_counter[d.id] > 1) {
+              console.log('whoa! Something funny going on with ' + d.id);
+              continue;
+            }
             if (d.we_timestamp > wendivs[ix].last) {
               wendivs[ix].last = d.we_timestamp;
             }
@@ -601,6 +624,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
             $(lid).find('abbr.timeago').timeago();
             ids.push(d._id);
           }
+          //console.log('ids = ' + JSON.stringify(ids));
           /* to stay at fixed length
           while ($(did + ' > div').length > count) {
             $(did + ' > div:last').remove();
@@ -638,6 +662,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
       cache: false,
       dataType: 'jsonp',
       success: function(d) {
+        console.log('in WEnotesTop!');
         var i, rowsl = d.rows.length,
             items = [], ids = [];
         for (i=0; i<rowsl; i++) {
@@ -656,6 +681,7 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
   // FIXME: describe what this method really does...
   function newPost(i, message) {
+    console.log('in newPost');
     // ignore design updates
     if (message._id.charAt(0) === '_') {
       return;
@@ -694,6 +720,10 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     return null;
   }
 
+
+  // start the WEnotes process
+  //console.log('starting WEnotes...'); 
+
   var msie = msieVersion();
   $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
   if (msie === 7) {
@@ -705,7 +735,6 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
     window.WEFclient = new Faye.Client(protocol + fayeURL, {
       timeout: 120
     });
-    console.log("got WEF client!");
     if (msie <= 8) {
       window.WEFclient.disable('autodisconnect');
     }
@@ -729,7 +758,6 @@ var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
         if (args.length === 3) {
           tag = args[2];
           // add each class' details to a list for future reference
-          console.log('We are here!');
           wendivs.push({
             $d: $thisd,
             count: args[1], // how many of this to show
