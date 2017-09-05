@@ -178,6 +178,7 @@ var msg_counter = [];
 
     var text = d.text;
     var timeLink = '#';
+    var feedURL = false;
     var profileURL = d.profile_url || '#';
     var profileIMG = user.profile_image_url || d.profile_image_url_https || d.profile_image_url ||
         '/extensions/WEnotes/missing.gif';
@@ -191,12 +192,14 @@ var msg_counter = [];
         profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
         break;
       case 'hypothesis':
+        feedURL = user.feed_url;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/hypothesis.png';
         console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
         console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
         break;
       case 'medium':
+        feedURL = user.feed_url;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/medium.png';
         console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
@@ -233,6 +236,8 @@ var msg_counter = [];
         d.created_at = [dp[2], months[dp[1]-1], dp[0], ''].join(' ') + dp[3] + ' +0000';
         break;
       case 'feed':
+        timeLink = d.we_link;
+        break;       
       case 'moodle':
       case 'ask':
       case 'groups':
@@ -380,7 +385,13 @@ var msg_counter = [];
       ' width=' + imgwidth + '></a></div><div class="WEnotebody">';
     msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
       '<b>' + userFullname + '</b>&nbsp;&nbsp;<span class="WEnoteuser">' +
-      '@' + userName + '</a></span><br />';
+      '@' + userName + '</a></span>';
+    // include an RSS Feed Icon link if a feed is defined
+    if (feedURL) {
+      feedIcon = '<img src="https://assets.oeru.org/rss_mini.png" alt="RSS feed URL for this person" />';
+      msg += '&nbsp;&nbsp;<a href="' + feedURL + '">' + feedIcon + '</a>';
+    } 
+    msg += '<br />';
     msg += text;
     var dt = new Date(d.created_at);
     var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
