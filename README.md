@@ -11,7 +11,7 @@ WEnotes consists of several parts:
     * Moodle instances (special RSS feed)
     * Twitter
     * [GroupServer](http://groupserver.org/) mailing lists (special RSS feed)
-    
+
 * a Mediawiki extension
     * verifies user is logged in
     * saves local post
@@ -31,3 +31,12 @@ streamed in near real time and others are polled periodically.  A
 [Faye](http://faye.jcoglan.com/) publish-subscribe messaging system
 posts the messages to interested clients.
 
+Notes:
+
+* to build the WEnotesClient.js and WEnotes-min.js, you must have uglifyjs and
+* to clone this archive, you must (after the initial clone) run
+    git submodule init
+    git submodule update
+  and you must have uglifyjs (or uglify-js) installed and potentially update
+  the Makefile to compensate for changing arguments (`-o filename` doesn't seem
+  to work with recent versions, needing to be replace by a `> filename`)
