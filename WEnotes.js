@@ -55,12 +55,12 @@ var protocol = window.location.protocol + '//';
 // hard coded locations of things
 //var fayeURL = 'faye.oerfoundation.org/faye/';
 //var fayeURL = 'faye.wenotes.oeru.org/faye/';
-var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+var fayeURL = 'faye.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
 //var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
-var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
 //alert('protocol = ' + protocol);
 //checkJSONp();
