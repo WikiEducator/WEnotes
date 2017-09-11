@@ -195,6 +195,7 @@ var msg_counter = [];
         feedURL = user.feed_url;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/hypothesis.png';
+        timeLink = d.we_link;
         console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
         console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
         break;
@@ -202,6 +203,7 @@ var msg_counter = [];
         feedURL = user.feed_url;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/medium.png';
+        timeLink = d.we_link;
         console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
         break;
       case 'wikieducator':
