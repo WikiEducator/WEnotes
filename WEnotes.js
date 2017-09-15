@@ -196,15 +196,15 @@ var msg_counter = [];
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/hypothesis.png';
         timeLink = d.we_link;
-        console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
-        console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
+        //console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
+        //console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
         break;
       case 'medium':
         feedURL = user.feed_url;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/medium.png';
         timeLink = d.we_link;
-        console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
+        //console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
         break;
       case 'wikieducator':
         profileURL = protocol + 'WikiEducator.org/User:' + user;
@@ -221,9 +221,9 @@ var msg_counter = [];
       case 'mastodon':
         timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
         profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
-        console.log('timeLink = ' + JSON.stringify(timeLink));
+        /*console.log('timeLink = ' + JSON.stringify(timeLink));
         console.log('profileURL = ' + JSON.stringify(profileURL));
-        console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
+        console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);*/
         break;
       case 'g+':
         timeLink = d.url;
@@ -422,8 +422,8 @@ var msg_counter = [];
       msg += 'mastodon.oeru';
     } else if (d.we_source === 'hypothesis') {
       msg += 'hypothes.is';
-      console.log("*** id = " + d.id);
-      console.log("dt = " + dt + ", dt_ago = " + dt_ago);
+      //console.log("*** id = " + d.id);
+      //console.log("dt = " + dt + ", dt_ago = " + dt_ago);
     } else {
       msg += d.we_source;
     }
@@ -475,7 +475,7 @@ var msg_counter = [];
   }
 
   function getMore(event) {
-    console.log('in getMore');
+    //console.log('in getMore');
     var options, url;
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
@@ -620,10 +620,10 @@ var msg_counter = [];
                msg_counter[d.id] = 0;
             }
             msg_counter[d.id] = msg_counter[d.id] + 1;
-            console.log('looking at id = ' + d.id + ' counter = ' + msg_counter[d.id]);
+            //console.log('looking at id = ' + d.id + ' counter = ' + msg_counter[d.id]);
             // we've seen this message before, don't show it again!
             if (msg_counter[d.id] > 1) {
-              console.log('whoa! Something funny going on with ' + d.id);
+              //console.log('whoa! Something funny going on with ' + d.id);
               continue;
             }
             if (d.we_timestamp > wendivs[ix].last) {
@@ -675,7 +675,7 @@ var msg_counter = [];
       cache: false,
       dataType: 'jsonp',
       success: function(d) {
-        console.log('in WEnotesTop!');
+        //console.log('in WEnotesTop!');
         var i, rowsl = d.rows.length,
             items = [], ids = [];
         for (i=0; i<rowsl; i++) {
@@ -694,7 +694,7 @@ var msg_counter = [];
 
   // FIXME: describe what this method really does...
   function newPost(i, message) {
-    console.log('in newPost');
+    //console.log('in newPost');
     // ignore design updates
     if (message._id.charAt(0) === '_') {
       return;
