@@ -607,10 +607,14 @@ var msg_counter = [];
           }
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
+            button_text = "More " + tag + " notes";
+            if (tag === '_') {
+              button_text = "More notes"; 
+	    }
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
               ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
-              '" type="submit" value="More ' + tag + ' notes" />' +
+              '" type="submit" value="' + button_text + '" />' +
               '</div><br clear="all" />');
             $('#WEnotesMore' + ix).bind('click', { ix: ix }, getMore);
           }
