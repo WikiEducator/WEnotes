@@ -53,15 +53,15 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-//var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.wenotes.oeru.org/faye/';
 var fayeURL = 'faye.oerfoundation.org/faye/';
+//var fayeURL = 'faye.wenotes.oeru.org/faye/';
+//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
 var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
 //var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
+//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 //alert('protocol = ' + protocol);
 //checkJSONp();
 var msg_counter = [];
@@ -168,7 +168,7 @@ var msg_counter = [];
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
       hypothesis: 'https://hypothes.is/earch?q=tag%3A',
       identica: 'http://identi.ca/tag/',
-      mastodon: 'https://mastodon.oeru.org/api/v1/timelines/tag/',
+      mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
       'g+': 'http://plus.google.com/s/%23'
@@ -245,6 +245,7 @@ var msg_counter = [];
       case 'groups':
       case 'community':
       case 'forums':
+      case 'saylor-discourse':
         timeLink = d.we_link;
         break;
       case 'chat':
@@ -332,6 +333,7 @@ var msg_counter = [];
     case 'groups':
     case 'community':
     case 'forums':
+    case 'saylor-discourse':
       if (d.truncated) {
         text = text.substring(0, text.lastIndexOf('...')) +
           '<a class="external text" href="' + d.we_link +
@@ -418,6 +420,8 @@ var msg_counter = [];
       msg += 'community.oeru';
     } else if (d.we_source === 'forums') {
       msg += 'forums.oeru';
+    } else if (d.we_source === 'saylor-discourse') {
+      msg += 'forums.saylor';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
     } else if (d.we_source === 'hypothesis') {
