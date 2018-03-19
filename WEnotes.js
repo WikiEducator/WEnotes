@@ -54,16 +54,12 @@ var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
 var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.wenotes.oeru.org/faye/';
 //var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-//var couchHost = 'couch.wenotes.oeru.org/', couchDB = 'mentions-live';
 var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions-live';
 //var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
-//alert('protocol = ' + protocol);
-//checkJSONp();
+
 var msg_counter = [];
 
 (function () {
@@ -274,6 +270,8 @@ var msg_counter = [];
           // special case for WikiEducator user names
           if ((type === '@') && (source === 'wikieducator')) {
             moniker = word;
+          } else if ((type === '@') && (source === 'mastodon')) {
+            moniker = '@'+word;
           } else {
             moniker = word.split('_'); // behaviour with underscores differs
             if(type === '#') moniker = moniker.join('');
@@ -319,27 +317,27 @@ var msg_counter = [];
 
     // liven abridged marks
     switch (source) {
-    case 'identica':
-    case 'mastodon':
-    case 'bookmarks':
-    case 'hypothesis':
-    case 'g+':
-    case 'medium':
-      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
-      break;
-    case 'moodle':
-    case 'ask':
-    case 'feed':
-    case 'groups':
-    case 'community':
-    case 'forums':
-    case 'saylor-discourse':
-      if (d.truncated) {
-        text = text.substring(0, text.lastIndexOf('...')) +
-          '<a class="external text" href="' + d.we_link +
-          '" target="_wenotes">...</a>';
-      }
-      break;
+	    case 'mastodon':
+	    case 'identica':
+	    case 'bookmarks':
+	    case 'hypothesis':
+	    case 'g+':
+	    case 'medium':
+	      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
+	      break;
+	    case 'moodle':
+	    case 'ask':
+	    case 'feed':
+	    case 'groups':
+	    case 'community':
+	    case 'forums':
+	    case 'saylor-discourse':
+	      if (d.truncated) {
+		text = text.substring(0, text.lastIndexOf('...')) +
+		  '<a class="external text" href="' + d.we_link +
+		  '" target="_wenotes">...</a>';
+	      }
+	      break;
     }
 
     // if we don't have a profile img or url, use gravatar if available
