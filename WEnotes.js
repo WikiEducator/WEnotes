@@ -235,7 +235,7 @@ var msg_counter = [];
         break;
       case 'feed':
         timeLink = d.we_link;
-        break;       
+        break;
       case 'moodle':
       case 'ask':
       case 'groups':
@@ -281,10 +281,10 @@ var msg_counter = [];
 
         switch(type) {
           case 'http://': case 'https://': // html links
-            href = scheme + '://' + url; 
+            href = scheme + '://' + url;
             break;
           case '@': // link users
-            href = sourceProfile[source] + moniker; 
+            href = sourceProfile[source] + moniker;
             break;
           case '!': // link groups
             href = 'http://identi.ca/group/' + moniker;
@@ -392,7 +392,7 @@ var msg_counter = [];
     if (feedURL) {
       feedIcon = '<img src="https://assets.oeru.org/rss_mini.png" alt="RSS feed URL for this person" />';
       msg += '&nbsp;&nbsp;<a href="' + feedURL + '">' + feedIcon + '</a>';
-    } 
+    }
     msg += '<br />';
     msg += text;
     var dt = new Date(d.created_at);
@@ -611,7 +611,7 @@ var msg_counter = [];
             wendivs[ix].nomore = true;
             button_text = "More " + tag + " notes";
             if (tag === '_') {
-              button_text = "More notes"; 
+              button_text = "More notes";
 	    }
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
               ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
@@ -622,7 +622,7 @@ var msg_counter = [];
           }
           for (i=0; i<rows.length; i++) {
             var d = rows[i].doc;
-            if (typeof msg_counter[d.id] === 'undefined') { 
+            if (typeof msg_counter[d.id] === 'undefined') {
                msg_counter[d.id] = 0;
             }
             msg_counter[d.id] = msg_counter[d.id] + 1;
@@ -741,7 +741,7 @@ var msg_counter = [];
 
 
   // start the WEnotes process
-  //console.log('starting WEnotes...'); 
+  //console.log('starting WEnotes...');
 
   var msie = msieVersion();
   $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
