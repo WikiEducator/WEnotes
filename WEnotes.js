@@ -53,12 +53,12 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
@@ -158,6 +158,9 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/',
       twitter: 'https://twitter.com/',
       wikieducator: protocol + 'WikiEducator.org/User:',
+      forums: 'https://forums.oeru.org/users/',
+      community: 'https://community.oeru.org/users/',
+      saylordiscourse: 'https://discourse.saylor.org/users/',
       'g+': '#'
     };
     var sourceTag = {
@@ -170,6 +173,7 @@ var msg_counter = [];
       'g+': 'http://plus.google.com/s/%23'
     };
     var source = d.we_source;
+    if (source === 'saylor-discourse') source = 'saylordiscourse';
     var user = d.user || d.from_user;
 
     var text = d.text;
@@ -241,7 +245,7 @@ var msg_counter = [];
       case 'groups':
       case 'community':
       case 'forums':
-      case 'saylor-discourse':
+      case 'saylordiscourse':
         timeLink = d.we_link;
         break;
       case 'chat':
@@ -270,8 +274,10 @@ var msg_counter = [];
           // special case for WikiEducator user names
           if ((type === '@') && (source === 'wikieducator')) {
             moniker = word;
+          } else if ((type === '@') && ((source === 'forums') || (source === 'saylordiscourse') || (source === 'community'))) {
+            moniker = word;
           } else if ((type === '@') && (source === 'mastodon')) {
-            moniker = '@'+word;
+            moniker = '@' + word;
           } else {
             moniker = word.split('_'); // behaviour with underscores differs
             if(type === '#') moniker = moniker.join('');
@@ -331,7 +337,7 @@ var msg_counter = [];
 	    case 'groups':
 	    case 'community':
 	    case 'forums':
-	    case 'saylor-discourse':
+	    case 'saylordiscourse':
 	      if (d.truncated) {
 		text = text.substring(0, text.lastIndexOf('...')) +
 		  '<a class="external text" href="' + d.we_link +
@@ -418,7 +424,7 @@ var msg_counter = [];
       msg += 'community.oeru';
     } else if (d.we_source === 'forums') {
       msg += 'forums.oeru';
-    } else if (d.we_source === 'saylor-discourse') {
+    } else if (d.we_source === 'saylordiscourse') {
       msg += 'forums.saylor';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
