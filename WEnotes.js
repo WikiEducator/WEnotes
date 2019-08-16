@@ -221,6 +221,7 @@ var msg_counter = [];
       case 'mastodon':
         timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
         profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
+        userFullname = user.name || user.screen_name;
         /*console.log('timeLink = ' + JSON.stringify(timeLink));
         console.log('profileURL = ' + JSON.stringify(profileURL));
         console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);*/
