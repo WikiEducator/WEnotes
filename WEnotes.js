@@ -154,7 +154,7 @@ var msg_counter = [];
     var sourceProfile = {
       bookmarks: 'https://bookmarks.oeru.org/',
       hypothesis: 'https://hypothes.is/',
-      identica: 'http://identi.ca/',
+      identica: 'https://identi.ca/',
       mastodon: 'https://mastodon.oeru.org/',
       twitter: 'https://twitter.com/',
       wikieducator: protocol + 'WikiEducator.org/User:',
@@ -166,11 +166,11 @@ var msg_counter = [];
     var sourceTag = {
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
       hypothesis: 'https://hypothes.is/earch?q=tag%3A',
-      identica: 'http://identi.ca/tag/',
+      identica: 'https://identi.ca/tag/',
       mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
-      'g+': 'http://plus.google.com/s/%23'
+      'g+': 'https://plus.google.com/s/%23'
     };
     var source = d.we_source;
     if (source === 'saylor-discourse') source = 'saylordiscourse';
@@ -215,19 +215,21 @@ var msg_counter = [];
         profileURL = 'https://twitter.com/' + user;
         break;
       case 'identica':
-        timeLink = 'http://identi.ca/notice/' + d.id;
+        timeLink = 'https://identi.ca/notice/' + d.id;
         profileURL = user.statusnet_profile_url;
         break;
       case 'mastodon':
-        timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
-        profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
+        //timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
+	timeLink = d.uri;
+        //profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
+	profileURL = d.profile_url;
         userFullname = user.name || user.screen_name;
         if (userFullname == 'undefined') {
             userFullname = user.screen_name;
         }
-        /*console.log('timeLink = ' + JSON.stringify(timeLink));
+        console.log('timeLink = ' + JSON.stringify(timeLink));
         console.log('profileURL = ' + JSON.stringify(profileURL));
-        console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);*/
+        console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
         break;
       case 'g+':
         timeLink = d.url;
@@ -297,7 +299,7 @@ var msg_counter = [];
             href = sourceProfile[source] + moniker;
             break;
           case '!': // link groups
-            href = 'http://identi.ca/group/' + moniker;
+            href = 'https://identi.ca/group/' + moniker;
             break;
           case '#': // link tags
             href = sourceTag[source] + moniker;
@@ -373,7 +375,7 @@ var msg_counter = [];
     // try to get the width from the URL
     var imgwidth = (d.profile_image_width) ? d.profile_image_width : 48;
     var imgheight = (d.profile_image_height) ? d.profile_image_height : 48;
-    var mo = profileIMG.match(/http:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
+    var mo = profileIMG.match(/https:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
     //var mo = profileIMG.match(/(http|https):\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
     /*if (protocol == 'https://') {
       mo = mo.replace('http:','https:');
