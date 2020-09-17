@@ -190,6 +190,8 @@ var msg_counter = [];
         timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
         profileURL = user.profile_url;
         profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
+        // d.created_at is on UTC, not NZ time... so compensate.
+        d.created_at = d.we_timestamp;
         break;
       case 'hypothesis':
         feedURL = user.feed_url;
