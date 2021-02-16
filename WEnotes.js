@@ -53,18 +53,19 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
 (function () {
   var couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
       couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time_unique?',
+      couchURLpath = protocol + couchHost + couchDB + '/_design/messages/_view/page_time?',
       weAPI = '/api.php';
 
 
@@ -570,8 +571,8 @@ var msg_counter = [];
   function WEnotes(ix) {
     var url, options, ids=[];
     var dx = wendivs[ix];
-
     var tag = dx.tag || 'wikieducator';
+    var page = true;
     var taglc = tag.toLowerCase();
     var count = dx.count || 20;
     // exploits knowing the milliseconds of all we_timestamp = .000i
@@ -585,6 +586,18 @@ var msg_counter = [];
       url = couchURLall;
       options = {
         endkey: '"' + lastplus + '"',
+        descending: true,
+        include_docs: true,
+        limit: count
+      };
+    } else if (page) {
+      console.log("!!! we're looking at a page!");
+      url = couchURLpath;
+      page = site_id + '-' + path_id;
+      options = {
+        key: '["' + page + '"]',
+        startkey: '["' + page + '",{}]',
+        endkey: '["' + page + '", "' + lastplus + '"]',
         descending: true,
         include_docs: true,
         limit: count

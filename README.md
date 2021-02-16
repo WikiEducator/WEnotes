@@ -38,10 +38,7 @@ hosting configuration](https://git.oeru.org/oeru/wenotes-docker)
 
 Notes:
 
-* to build the WEnotesClient.js and WEnotes-min.js, you must have uglifyjs and
 * to clone this archive, you must (after the initial clone) run
     git submodule init
     git submodule update
-  and you must have uglifyjs (or uglify-js) installed and potentially update
-  the Makefile to compensate for changing arguments (`-o filename` doesn't seem
-  to work with recent versions, needing to be replace by a `> filename`)
+* ensure you install the set of Node JS dependencies by running `npm install` in this directory, which will install the libraries (and their dependencies) listed in package.json
