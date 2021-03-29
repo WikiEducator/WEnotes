@@ -42,11 +42,20 @@ function WEnotesPostWP(id, tag, button, leftmargin) {
   function livenForm() {
     $button.click(function() {
       $button.attr('disabled', 'disabled');
+      $wenote_ids = null;
+      current_origin = window.location.origin.split('//')[1];
+      if (typeof WEnotesIDs != 'undefined') {
+         $wenotes_ids = WEnotesIDs;
+         console.log('===== setting $wenotes_ids = ', $wenotes_ids);
+         console.log('===== setting origin = ', current_origin);
+      }
       $.ajax({
         url: oeru_user_object.ajaxurl,
         data: {
           action: 'wenotes',
           format: 'json',
+          pathinfo: $wenotes_ids,
+          origin: current_origin,
           notag: tag,
           notext: $text.val()
         },

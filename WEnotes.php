@@ -16,7 +16,7 @@ require_once('sag/src/Sag.php');
 $wgExtensionCredits['parserhook'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'WEnotes',
-	'version'        => '0.7.0',
+	'version'        => '0.7.1',
 	'url'            => 'http://WikiEducator.org/Extension:WEnotes',
 	'author'         => '[http://WikiEducator.org/User:JimTittsler Jim Tittsler]',
         'description'    => 'add API calls for posting to a WEnotes microblog',
@@ -205,4 +205,3 @@ class APIWEnotes extends ApiQueryBase {
 		return __CLASS__ . ': 0';
 	}
 }
-

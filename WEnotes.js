@@ -572,7 +572,7 @@ var msg_counter = [];
     var url, options, ids=[];
     var dx = wendivs[ix];
     var tag = dx.tag || 'wikieducator';
-    var page = true;
+    var newstylepage = false;
     var taglc = tag.toLowerCase();
     var count = dx.count || 20;
     // exploits knowing the milliseconds of all we_timestamp = .000i
@@ -582,6 +582,12 @@ var msg_counter = [];
     }
     var refreshtime = 30000;
 
+    // if both site_id and path_id are defined in the current scope, we've got
+    // a new-style page
+    if (typeof site_id !== 'undefined' && typeof path_id !== 'undefined' ) {
+        newstylepage = true;
+    }
+
     if (tag === '_') {
       url = couchURLall;
       options = {
@@ -590,8 +596,8 @@ var msg_counter = [];
         include_docs: true,
         limit: count
       };
-    } else if (page) {
-      console.log("!!! we're looking at a page!");
+    } else if (newstylepage) {
+      console.log("!!! we're looking at a new style page!");
       url = couchURLpath;
       page = site_id + '-' + path_id;
       options = {
@@ -790,6 +796,7 @@ var msg_counter = [];
   // to hold individual subscriptions
   var subs = [];
   // for each WENotes instance on the page
+  console.log("==== looking for WEnotes class...");
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
     // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101
@@ -798,24 +805,28 @@ var msg_counter = [];
     // in the example above, 20 is the 'count' of messages to show,
     // and lida101 is the tag
     $.each(classes, function(i, v) {
+      console.log('==== v = ', v);
       if (v.indexOf('WEnotes-') === 0) {
         var tag;
         var args = v.split('-', 3);
-        if (args.length === 3) {
+        if (args.length > 2) {
           tag = args[2];
           // add each class' details to a list for future reference
           wendivs.push({
             $d: $thisd,
             count: args[1], // how many of this to show
-            tag: args[2], // from which tag
+            tag: tag, // from which tag
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
             moreCount: 20  // how many more to show if the user clicks "show more"
           });
 
           // actually subscribe to the Faye services for the relevant combo
-          subs[i] = client.subscribe('/WEnotes/' +
-                    ((tag === '_') ? '*' : tag.toLowerCase()), function(msg) {
+          combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
+          console.log('combo = ', combo);
+          subs[i] = client.subscribe(combo, function(msg) {
+            console.log('i = ', i);
+            console.log('msg = ', msg);
             newPost(i, msg);
           });
         }
@@ -846,6 +857,7 @@ var msg_counter = [];
   });
   $('div.WEnotes').on('WEnotes', WEnotesHandler);
   if (wendivs.length) {
+    console.log('wendivs has length '+wendivs.length);
     $('div.WEnotes:first').triggerHandler('WEnotes');
   }
   window.WEnotes.formatMessage = formatMessage;
