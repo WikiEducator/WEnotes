@@ -18,4 +18,4 @@ options.json
 # don't track our build output
 WEnotesClient.js
 WEnotes-min.js
-
+pagckage-lock.json
