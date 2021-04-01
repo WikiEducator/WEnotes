@@ -162,6 +162,7 @@ var msg_counter = [];
       forums: 'https://forums.oeru.org/users/',
       community: 'https://community.oeru.org/users/',
       saylordiscourse: 'https://discourse.saylor.org/users/',
+      connectoeglobal: 'https://connect.oeglobal.org/users/',
       'g+': '#'
     };
     var sourceTag = {
@@ -171,10 +172,13 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
+      connectoeglobal: 'https://connect.oeglobal.org/users/',
       'g+': 'https://plus.google.com/s/%23'
     };
+    // fix changed source tags...
     var source = d.we_source;
     if (source === 'saylor-discourse') source = 'saylordiscourse';
+    if (source === 'connect.oeglobal') source = 'connectoeglobal';
     var user = d.user || d.from_user;
 
     var text = d.text;
@@ -223,9 +227,9 @@ var msg_counter = [];
         break;
       case 'mastodon':
         //timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
-	timeLink = d.uri;
+	      timeLink = d.uri;
         //profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
-	profileURL = d.profile_url;
+	      profileURL = d.profile_url;
         userFullname = user.name || user.screen_name;
         if (userFullname == 'undefined') {
             userFullname = user.screen_name;
@@ -254,6 +258,7 @@ var msg_counter = [];
       case 'groups':
       case 'community':
       case 'forums':
+      case 'connectoeglobal';
       case 'saylordiscourse':
         timeLink = d.we_link;
         break;
@@ -347,10 +352,11 @@ var msg_counter = [];
 	    case 'community':
 	    case 'forums':
 	    case 'saylordiscourse':
+      case 'connectoeglobal':
 	      if (d.truncated) {
-		text = text.substring(0, text.lastIndexOf('...')) +
-		  '<a class="external text" href="' + d.we_link +
-		  '" target="_wenotes">...</a>';
+		        text = text.substring(0, text.lastIndexOf('...')) +
+		        '<a class="external text" href="' + d.we_link +
+		        '" target="_wenotes">...</a>';
 	      }
 	      break;
     }
@@ -435,6 +441,8 @@ var msg_counter = [];
       msg += 'forums.oeru';
     } else if (d.we_source === 'saylordiscourse') {
       msg += 'forums.saylor';
+    } else if (d.we_source === 'connectoeglobal') {
+      msg += 'connect.oeglobal';
     } else if (d.we_source === 'mastodon') {
       msg += 'mastodon.oeru';
     } else if (d.we_source === 'hypothesis') {
