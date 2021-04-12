@@ -267,8 +267,9 @@ var msg_counter = [];
         break;
       case 'wenotes_wp':
         userFullname = d.from_user_name;
-        userName = userFullname;
-        timeLink = '<a href="'+d.we_origin_schema+'://'+d.we_origin+'/'+d.we_origin_path+'">'+d.we_source_name+'</a>';
+        userName = d.from_user;
+        //timeLink = '<a href="'+d.we_origin_schema+'://'+d.we_origin+'/'+d.we_origin_path+'">'+d.we_source_name+'</a>';
+        timeLink = d.we_origin_schema+'://'+d.we_origin+d.we_origin_path;
         break;
     }
 
@@ -357,7 +358,7 @@ var msg_counter = [];
 	    case 'community':
 	    case 'forums':
 	    case 'saylordiscourse':
-      case 'connectoeglobal':
+            case 'connectoeglobal':
 	      if (d.truncated) {
 		        text = text.substring(0, text.lastIndexOf('...')) +
 		        '<a class="external text" href="' + d.we_link +
@@ -375,6 +376,8 @@ var msg_counter = [];
     if ((profileURL === '') && d.gravatar) {
       profileURL = 'https://www.gravatar.com/' + d.gravatar;
     }
+    //
+    // set up the actual message published in the feed for each mention
     msg = '<div id="WEitf' + d._id + '" class="WEnote">';
     msg += '<div class="WEnotepic"><a href="' +
             profileURL + '"><img ';
@@ -438,6 +441,16 @@ var msg_counter = [];
     }
     if (d.we_source === 'feed') {
       msg += '<span title="' + d.we_feed + '">blog</span>';
+    } else if (d.we_source === 'wenotes_wp' || d.we_source === 'course') {
+      var coursesite = 'course.oeru';
+      if (typeof d.we_source_url != 'undefined') {
+	  if (d.we_source_url === 'course.oeglobal.org') {
+	      coursesite = 'course.oeglobal';
+	  } else {  
+	      coursesite = 'course.oeru';
+          }
+      }
+      msg += coursesite;
     } else if (d.we_source === 'groups') {
       msg += 'groups.oeru';
     } else if (d.we_source === 'community') {
