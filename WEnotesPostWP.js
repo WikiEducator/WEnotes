@@ -44,6 +44,8 @@ function WEnotesPostWP(id, tag, button, leftmargin) {
       $button.attr('disabled', 'disabled');
       $wenote_ids = null;
       current_origin = window.location.origin.split('//')[1];
+      current_schema = window.location.origin.split('//')[0].split(':')[0];
+      current_path = window.location.pathname;
       if (typeof WEnotesIDs != 'undefined') {
          $wenotes_ids = WEnotesIDs;
          console.log('===== setting $wenotes_ids = ', $wenotes_ids);
@@ -56,6 +58,8 @@ function WEnotesPostWP(id, tag, button, leftmargin) {
           format: 'json',
           pathinfo: $wenotes_ids,
           origin: current_origin,
+          origin_path: current_path,
+          origin_schema: current_schema,
           notag: tag,
           notext: $text.val()
         },

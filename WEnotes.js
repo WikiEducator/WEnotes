@@ -258,12 +258,17 @@ var msg_counter = [];
       case 'groups':
       case 'community':
       case 'forums':
-      case 'connectoeglobal';
+      case 'connectoeglobal':
       case 'saylordiscourse':
         timeLink = d.we_link;
         break;
       case 'chat':
         timeLink = d.url;
+        break;
+      case 'wenotes_wp':
+        userFullname = d.from_user_name;
+        userName = userFullname;
+        timeLink = '<a href="'+d.we_origin_schema+'://'+d.we_origin+'/'+d.we_origin_path+'">'+d.we_source_name+'</a>';
         break;
     }
 
