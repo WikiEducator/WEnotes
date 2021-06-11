@@ -50,7 +50,7 @@ if ( !Date.prototype.toISOString ) {
 
 // variables made public to simplify debugging/monitoring
 var wendivs = [];
-var wenlang = 'en_EN'; // set language to default... 
+var wenlang = 'en_EN'; // set language to default...
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
@@ -447,7 +447,7 @@ var msg_counter = [];
       if (typeof d.we_source_url != 'undefined') {
 	  if (d.we_source_url === 'course.oeglobal.org') {
 	      coursesite = 'course.oeglobal';
-	  } else {  
+	  } else {
 	      coursesite = 'course.oeru';
           }
       }
@@ -661,6 +661,7 @@ var msg_counter = [];
         },
         success: function(data) {
           console.log("data = " + JSON.stringify(data));
+          console.log('current setting for wenlang '+ wenlang);
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -674,20 +675,20 @@ var msg_counter = [];
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             console.log('language for wendivs '+ix+' is ', data.language);
-            if (typeof data.language != undefined && 
-	      data.language == 'fr_FR') {
+            if (typeof data.language != undefined &&
+    	        data.language == 'fr_FR') {
               button_text = "Des notes plus " + tag;
               if (tag === '_') {
                 button_text = "Plus de notes";
               }
-	      console.log('chose fr_FR: '+button_text);
+	            console.log('chose fr_FR: '+button_text);
             } else {
               button_text = "More " + tag + " notes";
               if (tag === '_') {
                 button_text = "More notes";
-	      }
-	      console.log('chose not-fr_FR: '+button_text);
-  	    }
+	            }
+	            console.log('chose not-fr_FR: '+button_text);
+      	    }
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
               ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
