@@ -3065,8 +3065,7 @@ var msg_counter = [];
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
             console.log('language for wendivs '+ix+' is ', data.language);
-            if (typeof data.language != undefined &&
-    	        data.language == 'fr_FR') {
+            if (wenlang == 'fr_FR') {
               button_text = "Des notes plus " + tag;
               if (tag === '_') {
                 button_text = "Plus de notes";
