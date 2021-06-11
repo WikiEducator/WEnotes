@@ -2440,15 +2440,16 @@ if ( !Date.prototype.toISOString ) {
 
 // variables made public to simplify debugging/monitoring
 var wendivs = [];
+var wenlang = 'en_EN'; // set language to default... 
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
@@ -2917,9 +2918,8 @@ var msg_counter = [];
         language = wendivs[ix].language,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
-
-    console.log('language = '+ language);
-
+    wenlang = language;
+    console.log('setting wenlang = '+language);
     $wenmdi.show();
     $wenm.hide();
     if (tag === '_') {
@@ -2946,8 +2946,8 @@ var msg_counter = [];
       };
     }
 
-    console.log("url1 = " + url);
-    console.log("options = " + options);
+    //console.log("url1 = " + url);
+    //console.log("options = " + options);
 
     $.ajax({
         url: url + makeCouchqs(options),
@@ -3255,7 +3255,8 @@ var msg_counter = [];
             moreCount: 20  // how many more to show if the user clicks "show more"
           });
 
-	  console.log('language for WEnote: '+args[4]);
+ 	  wenlang = args[4];
+	  console.log('wenlang for WEnote: '+wenlang);
           // actually subscribe to the Faye services for the relevant combo
           combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
           console.log('combo = ', combo);
