@@ -2914,8 +2914,11 @@ var msg_counter = [];
         tag = wendivs[ix].tag,
         taglc = tag.toLowerCase(),
         count = wendivs[ix].moreCount + 1,
+        language = wendivs[ix].language,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
+
+    console.log('language = '+ language);
 
     $wenmdi.show();
     $wenm.hide();
@@ -2927,7 +2930,8 @@ var msg_counter = [];
         endkey: '"2011-01-01T00:00:00.000Z"',
         descending: true,
         include_docs: true,
-        limit: count
+        limit: count,
+	language: language
       };
     } else {
       url = couchURL;
@@ -2937,12 +2941,13 @@ var msg_counter = [];
         endkey: '["' + taglc + '", "2011-01-01T00:00:00.000Z"]',
         descending: true,
         include_docs: true,
-        limit: count
+        limit: count,
+	language: language
       };
     }
 
-    //console.log("url1 = " + url);
-    //console.log("options = " + options);
+    console.log("url1 = " + url);
+    console.log("options = " + options);
 
     $.ajax({
         url: url + makeCouchqs(options),
@@ -3045,7 +3050,7 @@ var msg_counter = [];
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
-          //console.log("data = " + JSON.stringify(data));
+          console.log("data = " + JSON.stringify(data));
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -3058,10 +3063,21 @@ var msg_counter = [];
           }
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
-            button_text = "More " + tag + " notes";
-            if (tag === '_') {
-              button_text = "More notes";
-	    }
+            console.log('language for wendivs '+ix+' is ', data.language);
+            if (typeof data.language != undefined && 
+	      data.language == 'fr_FR') {
+              button_text = "Des notes plus " + tag;
+              if (tag === '_') {
+                button_text = "Plus de notes";
+              }
+	      console.log('chose fr_FR: '+button_text);
+            } else {
+              button_text = "More " + tag + " notes";
+              if (tag === '_') {
+                button_text = "More notes";
+	      }
+	      console.log('chose not-fr_FR: '+button_text);
+  	    }
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
               ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
               '<input id="WEnotesMore' + ix +
@@ -3215,16 +3231,16 @@ var msg_counter = [];
   console.log("==== looking for WEnotes class...");
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
-    // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101
+    // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101-lida-fr_FR
     var classes = $(this).attr('class').split(/\s+/);
     // for each class, get useful info out of the class name
     // in the example above, 20 is the 'count' of messages to show,
-    // and lida101 is the tag
+    // and lida101 is the tag, lida is the 'context', and fr_FR is the language
     $.each(classes, function(i, v) {
       console.log('==== v = ', v);
       if (v.indexOf('WEnotes-') === 0) {
         var tag;
-        var args = v.split('-', 3);
+        var args = v.split('-', 5);
         if (args.length > 2) {
           tag = args[2];
           // add each class' details to a list for future reference
@@ -3232,11 +3248,14 @@ var msg_counter = [];
             $d: $thisd,
             count: args[1], // how many of this to show
             tag: tag, // from which tag
+	    context: args[3],
+            language: args[4],
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
             moreCount: 20  // how many more to show if the user clicks "show more"
           });
 
+	  console.log('language for WEnote: '+args[4]);
           // actually subscribe to the Faye services for the relevant combo
           combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
           console.log('combo = ', combo);
