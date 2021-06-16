@@ -510,7 +510,7 @@ var msg_counter = [];
           var args = v.split('-');
           //console.log('+++++ args = '+JSON.stringify(args));
           if (args.length > 3) {
- 	          wenlang = (args[3] !== '') ? args[3] : 'en_NZ';
+ 	          wenlang = (args[4] !== '') ? args[4] : 'en_NZ';
             console.log('found lang = '+wenlang);
             if (wenlang == 'fr_FR') {
               $.extend($.timeago.settings.strings = {
