@@ -53,12 +53,12 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-//var fayeURL = 'faye.oerfoundation.org/faye/';
-var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+var fayeURL = 'faye.oerfoundation.org/faye/';
+//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
