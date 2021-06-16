@@ -2896,12 +2896,12 @@ var msg_counter = [];
       var $details = $(this).attr('class').split(/\s+/);
       $.each($details, function(i, v) {
         if (v.indexOf('WEnotes-') === 0) {
-          //console.log('+++++ v = ', v);
+          console.log('+++++ v = ', v);
           var args = v.split('-');
           //console.log('+++++ args = '+JSON.stringify(args));
           if (args.length > 3) {
  	          wenlang = (args[4] !== '') ? args[4] : 'en_NZ';
-            //console.log('found lang = '+wenlang);
+            console.log('found lang = '+wenlang);
             if (wenlang == 'fr_FR') {
               $.extend($.timeago.settings.strings = {
                    // environ ~= about, it's optional
