@@ -2440,7 +2440,6 @@ if ( !Date.prototype.toISOString ) {
 
 // variables made public to simplify debugging/monitoring
 var wendivs = [];
-var wenlang = 'en_EN'; // set language to default...
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
@@ -2553,8 +2552,7 @@ var msg_counter = [];
       forums: 'https://forums.oeru.org/users/',
       community: 'https://community.oeru.org/users/',
       saylordiscourse: 'https://discourse.saylor.org/users/',
-      connectoeglobal: 'https://connect.oeglobal.org/users/',
-      'g+': '#'
+      connectoeglobal: 'https://connect.oeglobal.org/users/'
     };
     var sourceTag = {
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
@@ -2563,8 +2561,7 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
-      connectoeglobal: 'https://connect.oeglobal.org/users/',
-      'g+': 'https://plus.google.com/s/%23'
+      connectoeglobal: 'https://connect.oeglobal.org/users/'
     };
     // fix changed source tags...
     var source = d.we_source;
@@ -2628,18 +2625,6 @@ var msg_counter = [];
         console.log('timeLink = ' + JSON.stringify(timeLink));
         console.log('profileURL = ' + JSON.stringify(profileURL));
         console.log('(mastodon) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
-        break;
-      case 'g+':
-        timeLink = d.url;
-        text = d.title;
-        profileURL = d.actor.url;
-        profileIMG = d.actor.image.url;
-        userFullname = d.actor.displayName;
-        user = '';
-        userName = userFullname;
-        // old versions of IE don't understand ISO date format
-        var dp = d.published.split(/[-T.Z]/);
-        d.created_at = [dp[2], months[dp[1]-1], dp[0], ''].join(' ') + dp[3] + ' +0000';
         break;
       case 'feed':
         timeLink = d.we_link;
@@ -2738,7 +2723,6 @@ var msg_counter = [];
 	    case 'identica':
 	    case 'bookmarks':
 	    case 'hypothesis':
-	    case 'g+':
 	    case 'medium':
 	      text = text.replace(/\.\.\.$/, '<a href="' + timeLink + '">...</a>');
 	      break;
@@ -2815,10 +2799,15 @@ var msg_counter = [];
     }
     msg += '<br />';
     msg += text;
-    var dt = new Date(d.created_at);
-    var dt_ago = '<abbr class="timeago" title="' + dt.toISOString() + '">' +
-      dt.getUTCDate() + ' ' + months[dt.getUTCMonth()] + '</abbr>';
+    var lang = getLang();
+    //var dt = new Date(d.created_at);
+    //console.log('in flow, got lang '+lang);
+    var created_date = getDate(d.created_at, lang);
+    console.log('created date is '+ created_date);
+
+    var dt_ago = '<abbr class="timeago" title="' + created_date + '">'+created_date+'</abbr>';
     msg += '<br /><span class="WEnotesub">';
+    console.log('.... dt_ago = '+dt_ago);
     if (tag === '_') {
       if (d.we_tags) {
         //console.log('%%% type = ' + d.we_source + ' num tags = ' + d.we_tags.length);
@@ -2862,22 +2851,10 @@ var msg_counter = [];
       msg += d.we_source;
     }
     msg += '&nbsp;&nbsp;&nbsp;<a href="' + timeLink +
-      '" title="' + dt.toUTCString() + '" style="text-decoration: none;" target="_wenotes">' +
+      '" title="' + created_date + '" style="text-decoration: none;" target="_wenotes">' +
       dt_ago + '</a>';
     if (!novoting && wgUserName) {
       msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
-    }
-    switch (source) {
-       case 'twitter':
-           // if the message is too old, don't show the conversation links
-           if (((new Date().getTime() - dt.getTime())/86400000) > 5.0) {
-               break;
-            }
-           // fall through to show links
-       case 'g+':
-           msg += '&nbsp;&nbsp;&nbsp;<i title="reply" class="icon-mail-reply"></i>';
-           msg += '&nbsp;&nbsp;&nbsp;<i title="thread" class="icon-th-list"></i>';
-           break;
     }
     msg += '&nbsp;<span class="wevtct"></span>';
     // add the "sysop-only" links to view the mention in the db, or delete it
@@ -2908,6 +2885,35 @@ var msg_counter = [];
     return optionList.join('&');
   }
 
+  // find the current language setting, if any. Otherwise, return en_EN...
+  function getLang() {
+    console.log('in getLang');
+    var wenlang = 'en_EN';
+    $('div.WEnotes').each(function() {
+      var $details = $(this).attr('class').split(/\s+/);
+      $.each($details, function(i, v) {
+        if (v.indexOf('WEnotes-') === 0) {
+          console.log('+++++ v = ', v);
+          var args = v.split('-');
+          console.log('+++++ args = '+JSON.stringify(args));
+          if (args.length > 3) {
+ 	          wenlang = (args[3] !== '') ? args[3] : 'en_NZ';
+            console.log('found lang = '+wenlang);
+          }
+        }
+      });
+    });
+    return wenlang;
+  }
+
+  function getDate(date, lang) {
+    var dt = new Date(date); // create date object
+    lang = (typeof lang !== 'undefined') ? lang.replace('_','-') : 'en-EN';
+    console.log('in getDate, lang is '+lang);
+    const options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
+    return dt.toLocaleDateString(lang, options);
+  }
+
   function getMore(event) {
     //console.log('in getMore');
     var options, url;
@@ -2915,11 +2921,8 @@ var msg_counter = [];
         tag = wendivs[ix].tag,
         taglc = tag.toLowerCase(),
         count = wendivs[ix].moreCount + 1,
-        language = wendivs[ix].language,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
-    wenlang = language;
-    console.log('setting wenlang = '+language);
     $wenmdi.show();
     $wenm.hide();
     if (tag === '_') {
@@ -2930,8 +2933,7 @@ var msg_counter = [];
         endkey: '"2011-01-01T00:00:00.000Z"',
         descending: true,
         include_docs: true,
-        limit: count,
-	language: language
+        limit: count
       };
     } else {
       url = couchURL;
@@ -2941,13 +2943,9 @@ var msg_counter = [];
         endkey: '["' + taglc + '", "2011-01-01T00:00:00.000Z"]',
         descending: true,
         include_docs: true,
-        limit: count,
-	language: language
+        limit: count
       };
     }
-
-    //console.log("url1 = " + url);
-    //console.log("options = " + options);
 
     $.ajax({
         url: url + makeCouchqs(options),
@@ -2969,6 +2967,8 @@ var msg_counter = [];
             $(mid).hide();
             return;
           }
+          var lang = getLang();
+          console.log('in CouchReturn, got lang '+lang);
           for (i=1; i < rows.length; i++) {
             d = rows[i].doc;
             if (d.we_timestamp > wendivs[ix].last) {
@@ -2978,8 +2978,7 @@ var msg_counter = [];
               wendivs[ix].first = d.we_timestamp;
             }
             $(mid).before(formatMessage(d, tag));
-            $('#WEitf'+d._id).find('abbr.timeago').timeago();
-            //$(lid).effect("highlight", {}, 1500);
+            //$('#WEitf'+d._id).find('abbr.timeago').timeago();
           }
           $wenmdi.hide();
           $wenm.show();
@@ -3050,8 +3049,8 @@ var msg_counter = [];
                       .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
         },
         success: function(data) {
-          console.log("data = " + JSON.stringify(data));
-          console.log('current setting for wenlang '+ wenlang);
+          //console.log("data = " + JSON.stringify(data));
+          //console.log('current setting for wenlang '+ wenlang);
           var i;
           var lid = '.WEnotes';
           var rows = data.rows;
@@ -3064,8 +3063,8 @@ var msg_counter = [];
           }
           if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
             wendivs[ix].nomore = true;
-            console.log('language for wendivs '+ix+' is ', data.language);
-            if (wenlang == 'fr_FR') {
+            //console.log('language for wendivs '+ix+' is ', data.language);
+            if (getLang() == 'fr_FR') {
               button_text = "Des notes plus " + tag;
               if (tag === '_') {
                 button_text = "Plus de notes";
@@ -3237,7 +3236,7 @@ var msg_counter = [];
     // in the example above, 20 is the 'count' of messages to show,
     // and lida101 is the tag, lida is the 'context', and fr_FR is the language
     $.each(classes, function(i, v) {
-      console.log('==== v = ', v);
+      //console.log('==== v = ', v);
       if (v.indexOf('WEnotes-') === 0) {
         var tag;
         var args = v.split('-', 5);
@@ -3248,15 +3247,15 @@ var msg_counter = [];
             $d: $thisd,
             count: args[1], // how many of this to show
             tag: tag, // from which tag
-	    context: args[3],
+	          context: args[3],
             language: args[4],
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
             moreCount: 20  // how many more to show if the user clicks "show more"
           });
 
- 	  wenlang = args[4];
-	  console.log('wenlang for WEnote: '+wenlang);
+ 	        wenlang = args[4];
+	        console.log('wenlang for WEnote: '+wenlang);
           // actually subscribe to the Faye services for the relevant combo
           combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
           console.log('combo = ', combo);

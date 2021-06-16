@@ -4,12 +4,20 @@
  */
 /* global wgPageName, oeru_user_object */
 /* exported WEnotesPostWP */
-function WEnotesPostWP(id, tag, button, leftmargin) {
+function WEnotesPostWP(id, tag, button, leftmargin, language) {
+  console.log('in WEnotesPostWP - language = '+language);
   var weAPI = '/api.php',
       postLength = 300,
       rawPostLength = postLength + 20;
   leftmargin = (leftmargin === '') ? 53 : leftmargin;
-  button = (button === '') ? 'Post a WEnote' : unescape(button);
+  default_button_text = 'Post a WEnote';
+  language = (language === '') ? 'en_EN' : language;
+  if (language == 'fr_FR' && (button === '' || button === default_button_text)) {
+    console.log('setting button language!');
+    button = 'Soumettre un WEnote';
+  }
+  button = (button === '') ? default_button_text : unescape(button);
+
 
   if (id.charAt(0) !== '#') {
     id = '#' + id;

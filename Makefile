@@ -5,3 +5,5 @@ WEnotesClient.js: WEnotes.js node_modules/faye/browser/faye-browser.js
 	/bin/cat node_modules/timeago/jquery.timeago.js node_modules/faye/browser/faye-browser.js \
 		WEnotes.js > WEnotesClient.js
 
+clean:
+	rm WEnotes-min.js && mv WEnotesClient.js WEnotesClient.js-prev 

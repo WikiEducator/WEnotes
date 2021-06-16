@@ -4,13 +4,15 @@ WEnotes
 WEnotes consists of several parts:
 
 * harvesting tools for:
-    * ASKBOT (special RSS feed)
+    * ASKBOT (special RSS feed) (defunct)
     * blogs (db table of RSS feeds)
-    * g+
+    * g+ (defunct)
+    * [GroupServer](http://groupserver.org/) mailing lists (special RSS feed) (defunct)
     * identica (defunct)
     * Moodle instances (special RSS feed)
     * Twitter
-    * [GroupServer](http://groupserver.org/) mailing lists (special RSS feed)
+    * various Mastodon instances
+    * various Discourse instances
 
 * a Mediawiki extension
     * verifies user is logged in

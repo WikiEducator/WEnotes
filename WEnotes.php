@@ -168,6 +168,13 @@ class APIWEnotes extends ApiQueryBase {
 
 			$result = $this->getResult();
 			$result->addValue('post', $this->getModuleName(), true);
+			// pass through the language value
+			if (isset($params['wenlang'])) {
+				error_log('setting value for wenlang '.$params['wenlang']);
+				$result->addValue('wenlang', $params['wenlang'], true);
+			} else {
+				error_log('no value for wenlang...');				
+			}
 		}
 	}
 
