@@ -82,7 +82,7 @@ var msg_counter = [];
   }
 
   function windowConv() {
-    var url = $(this).closest('.WEnote').find('abbr').parent().attr('href');
+    var url = $(this).closest('.WEnote').find('time').parent().attr('href');
     window.open(url, '_twitter');
     return false;
   }
@@ -151,7 +151,7 @@ var msg_counter = [];
 
   function formatMessage(d, tag, novoting) {
     var msg, userName, userFullname, i, aspect;
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    //var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var sourceProfile = {
       bookmarks: 'https://bookmarks.oeru.org/',
       hypothesis: 'https://hypothes.is/',
@@ -413,9 +413,12 @@ var msg_counter = [];
     //var dt = new Date(d.created_at);
     //console.log('in flow, got lang '+lang);
     var created_date = getDate(d.created_at, lang);
+    var iso_date = getISODate(d.created_at);
+    //var ago_date = getTimeago(d.created_at, lang);
     console.log('created date is '+ created_date);
 
-    var dt_ago = '<abbr class="timeago" title="' + created_date + '">'+created_date+'</abbr>';
+    //var dt_ago = '<time class="timeago" datetime="'+iso_date+'" title="'+created_date+'">'+created_date+'</time>';
+    var dt_ago = '<time class="timeago" datetime="'+iso_date+'">'+created_date+'</time>';
     msg += '<br /><span class="WEnotesub">';
     console.log('.... dt_ago = '+dt_ago);
     if (tag === '_') {
@@ -498,17 +501,35 @@ var msg_counter = [];
   // find the current language setting, if any. Otherwise, return en_EN...
   function getLang() {
     console.log('in getLang');
-    var wenlang = 'en_EN';
+    var wenlang = 'en_NZ';
     $('div.WEnotes').each(function() {
       var $details = $(this).attr('class').split(/\s+/);
       $.each($details, function(i, v) {
         if (v.indexOf('WEnotes-') === 0) {
-          console.log('+++++ v = ', v);
+          //console.log('+++++ v = ', v);
           var args = v.split('-');
-          console.log('+++++ args = '+JSON.stringify(args));
+          //console.log('+++++ args = '+JSON.stringify(args));
           if (args.length > 3) {
  	          wenlang = (args[3] !== '') ? args[3] : 'en_NZ';
-            console.log('found lang = '+wenlang);
+            //console.log('found lang = '+wenlang);
+            if (wenlang == 'fr_FR') {
+              $.extend($.timeago.settings.strings = {
+                   // environ ~= about, it's optional
+                   prefixAgo: "il y a",
+                   prefixFromNow: "d'ici",
+                   seconds: "moins d'une minute",
+                   minute: "environ une minute",
+                   minutes: "environ %d minutes",
+                   hour: "environ une heure",
+                   hours: "environ %d heures",
+                   day: "environ un jour",
+                   days: "environ %d jours",
+                   month: "environ un mois",
+                   months: "environ %d mois",
+                   year: "un an",
+                   years: "%d ans"
+              });
+            }
           }
         }
       });
@@ -516,10 +537,15 @@ var msg_counter = [];
     return wenlang;
   }
 
+  function getISODate(date) {
+    var dt = new Date(date); // create date object
+    return dt.toISOString();
+  }
+
   function getDate(date, lang) {
     var dt = new Date(date); // create date object
     lang = (typeof lang !== 'undefined') ? lang.replace('_','-') : 'en-EN';
-    console.log('in getDate, lang is '+lang);
+    //console.log('in getDate, lang is '+lang);
     const options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
     return dt.toLocaleDateString(lang, options);
   }
@@ -588,7 +614,7 @@ var msg_counter = [];
               wendivs[ix].first = d.we_timestamp;
             }
             $(mid).before(formatMessage(d, tag));
-            $('#WEitf'+d._id).find('abbr.timeago').timeago();
+            $('#WEitf'+d._id).find('time.timeago').timeago();
             //$(lid).effect("highlight", {}, 1500);
           }
           $wenmdi.hide();
@@ -715,7 +741,7 @@ var msg_counter = [];
             }
             $(lid).after(formatMessage(d, tag));
             lid = '#WEitf' + d._id;
-            $(lid).find('abbr.timeago').timeago();
+            $(lid).find('time.timeago').timeago();
             ids.push(d._id);
           }
           //console.log('ids = ' + JSON.stringify(ids));
@@ -785,7 +811,7 @@ var msg_counter = [];
       if (!message.we_d) {   // don't show new deletions
         var wd = wendivs[i-1];
         wd.$d.prepend(formatMessage(message, wd.tag));
-        $('#WEitf'+ message._id).find('abbr.timeago').timeago();
+        $('#WEitf'+ message._id).find('time.timeago').timeago();
       }
     } else { // we've seen this message, is it going away?
       if (message.we_d) {
