@@ -439,6 +439,8 @@ var msg_counter = [];
       if (typeof d.we_source_url != 'undefined') {
 	  if (d.we_source_url === 'course.oeglobal.org') {
 	      coursesite = 'course.oeglobal';
+          } else if (d.we_source_url === 'pacificopencourses.col.org') {
+              coursesite = 'pacificcourse.col';
 	  } else {
 	      coursesite = 'course.oeru';
           }
