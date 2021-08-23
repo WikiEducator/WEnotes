@@ -865,7 +865,7 @@ var msg_counter = [];
   var client = window.WEFclient;
   // to hold individual subscriptions
   var subs = [];
-  // for each WENotes instance on the page
+  // for each WEnotes instance on the page
   console.log("==== looking for WEnotes class...");
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
