@@ -2552,7 +2552,8 @@ var msg_counter = [];
       forums: 'https://forums.oeru.org/u/',
       community: 'https://community.oeru.org/u/',
       saylordiscourse: 'https://discourse.saylor.org/u/',
-      connectoeglobal: 'https://connect.oeglobal.org/u/'
+      connectoeglobal: 'https://connect.oeglobal.org/u/',
+      milllforum: 'https://forum.milll.ws/u/'
     };
     var sourceTag = {
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
@@ -2561,7 +2562,8 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
-      connectoeglobal: 'https://connect.oeglobal.org/u/'
+      connectoeglobal: 'https://connect.oeglobal.org/u/',
+      milllforum: 'https://forum.milll.ws/u/'
     };
     // fix changed source tags...
     var source = d.we_source;
@@ -2632,10 +2634,14 @@ var msg_counter = [];
       case 'moodle':
       case 'ask':
       case 'groups':
+        timeLink = d.we_link;
+        break;
       case 'community':
       case 'forums':
       case 'connectoeglobal':
       case 'saylordiscourse':
+      case 'milllforum':
+        profileURL = d.profile_url.replace('/users/', '/u/'); // change to default Discourse user profile path 
         timeLink = d.we_link;
         break;
       case 'chat':
