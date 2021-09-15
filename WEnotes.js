@@ -159,10 +159,10 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/',
       twitter: 'https://twitter.com/',
       wikieducator: protocol + 'WikiEducator.org/User:',
-      forums: 'https://forums.oeru.org/users/',
-      community: 'https://community.oeru.org/users/',
-      saylordiscourse: 'https://discourse.saylor.org/users/',
-      connectoeglobal: 'https://connect.oeglobal.org/users/'
+      forums: 'https://forums.oeru.org/u/',
+      community: 'https://community.oeru.org/u/',
+      saylordiscourse: 'https://discourse.saylor.org/u/',
+      connectoeglobal: 'https://connect.oeglobal.org/u/'
     };
     var sourceTag = {
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
