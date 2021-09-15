@@ -171,7 +171,7 @@ var msg_counter = [];
       mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
-      connectoeglobal: 'https://connect.oeglobal.org/users/'
+      connectoeglobal: 'https://connect.oeglobal.org/u/'
     };
     // fix changed source tags...
     var source = d.we_source;
