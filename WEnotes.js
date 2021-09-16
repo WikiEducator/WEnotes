@@ -251,7 +251,7 @@ var msg_counter = [];
       case 'connectoeglobal':
       case 'saylordiscourse':
       case 'milllforum':
-        profileURL = d.profile_url.replace('/users/', '/u/'); // change to default Discourse user profile path 
+        profileURL = d.profile_url.replace('/users/', '/u/'); // change to default Discourse user profile path
         timeLink = d.we_link;
         break;
       case 'chat':
@@ -441,16 +441,19 @@ var msg_counter = [];
     if (d.we_source === 'feed') {
       msg += '<span title="' + d.we_feed + '">blog</span>';
     } else if (d.we_source === 'wenotes_wp' || d.we_source === 'course') {
+      console.log('figuring out source attribution: ', d);
       var coursesite = 'course.oeru';
       if (typeof d.we_source_url != 'undefined') {
-	  if (d.we_source_url === 'course.oeglobal.org') {
-	      coursesite = 'course.oeglobal';
+          console.log('we have a source_url: ', d.we_source_url);
+    	  if (d.we_source_url === 'course.oeglobal.org') {
+    	      coursesite = 'course.oeglobal';
           } else if (d.we_source_url === 'pacificopencourses.col.org') {
               coursesite = 'pacificcourse.col';
-	  } else {
-	      coursesite = 'course.oeru';
+    	  } else {
+    	      coursesite = 'course.oeru';
           }
       }
+      console.log('we got a message: ', coursesite);
       msg += coursesite;
     } else if (d.we_source === 'groups') {
       msg += 'groups.oeru';
