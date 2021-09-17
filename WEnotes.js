@@ -260,6 +260,7 @@ var msg_counter = [];
       case 'wenotes_wp':
         userFullname = d.from_user_name;
         userName = d.from_user;
+        profileURL = '';
         //timeLink = '<a href="'+d.we_origin_schema+'://'+d.we_origin+'/'+d.we_origin_path+'">'+d.we_source_name+'</a>';
         timeLink = d.we_origin_schema+'://'+d.we_origin+d.we_origin_path;
         break;
@@ -405,9 +406,15 @@ var msg_counter = [];
     msg += 'src="' + profileIMG +
       '" height=' + imgheight +
       ' width=' + imgwidth + '></a></div><div class="WEnotebody">';
-    msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
-      '<b>' + userFullname + '</b>&nbsp;&nbsp;<span class="WEnoteuser">' +
-      '@' + userName + '</a></span>';
+    // it doesn't make sense to line to a user in the case of WEnotes post from WordPress
+    if (source === 'wenotes_wp') {
+        msg += '<b>' + userFullname + '</b>&nbsp;&nbsp;<span class="WEnoteuser">' +
+          '@' + userName + '</span>';
+    } else {
+        msg += '<a href="' + profileURL + '" style="text-decoration: none;">' +
+          '<b>' + userFullname + '</b>&nbsp;&nbsp;<span class="WEnoteuser">' +
+          '@' + userName + '</a></span>';
+    }
     // include an RSS Feed Icon link if a feed is defined
     if (feedURL) {
       feedIcon = '<img src="https://assets.oeru.org/rss_mini.png" alt="RSS feed URL for this person" />';
