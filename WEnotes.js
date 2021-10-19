@@ -722,7 +722,7 @@ var msg_counter = [];
             if (getLang() == 'fr_FR') {
               button_text = "Plus d’actualités " + tag;
               if (tag === '_') {
-                button_text = "Plus de notes";
+                button_text = "Plus d’actualités";
               }
 	            console.log('chose fr_FR: '+button_text);
             } else {
