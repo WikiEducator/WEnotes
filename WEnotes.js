@@ -720,7 +720,7 @@ var msg_counter = [];
             wendivs[ix].nomore = true;
             //console.log('language for wendivs '+ix+' is ', data.language);
             if (getLang() == 'fr_FR') {
-              button_text = "Des notes plus " + tag;
+              button_text = "Plus d’actualités " + tag;
               if (tag === '_') {
                 button_text = "Plus de notes";
               }
