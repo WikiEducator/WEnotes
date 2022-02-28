@@ -468,6 +468,8 @@ var msg_counter = [];
       msg += 'community.oeru';
     } else if (d.we_source === 'forums') {
       msg += 'forums.oeru';
+    } else if (d.we_source === 'milllforum') {
+      msg += 'forum.milll';
     } else if (d.we_source === 'saylordiscourse') {
       msg += 'forums.saylor';
     } else if (d.we_source === 'connectoeglobal') {
