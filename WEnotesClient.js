@@ -2858,6 +2858,8 @@ var msg_counter = [];
       msg += 'community.oeru';
     } else if (d.we_source === 'forums') {
       msg += 'forums.oeru';
+    } else if (d.we_source === 'milllforum') {
+      msg += 'forum.milll';
     } else if (d.we_source === 'saylordiscourse') {
       msg += 'forums.saylor';
     } else if (d.we_source === 'connectoeglobal') {
@@ -3112,7 +3114,7 @@ var msg_counter = [];
             if (getLang() == 'fr_FR') {
               button_text = "Plus d’actualités " + tag;
               if (tag === '_') {
-                button_text = "Plus de notes";
+                button_text = "Plus d’actualités";
               }
 	            console.log('chose fr_FR: '+button_text);
             } else {
