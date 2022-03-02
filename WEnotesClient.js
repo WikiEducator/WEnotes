@@ -2846,6 +2846,8 @@ var msg_counter = [];
     	      coursesite = 'course.oeglobal';
           } else if (d.we_source_url === 'pacificopencourses.col.org') {
               coursesite = 'pacificcourse.col';
+          } else if (d.we_source_url === 'course.milll.ws') {
+	      coursesite = 'course.milll';
     	  } else {
     	      coursesite = 'course.oeru';
           }
