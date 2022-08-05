@@ -53,12 +53,12 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
@@ -169,7 +169,7 @@ var msg_counter = [];
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
       hypothesis: 'https://hypothes.is/earch?q=tag%3A',
       identica: 'https://identi.ca/tag/',
-      mastodon: 'https://mastodon.oeru.org/web/timelines/tag/',
+      mastodon: 'https://mastodon.oeru.org/tags/',
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
       connectoeglobal: 'https://connect.oeglobal.org/u/',
@@ -270,6 +270,10 @@ var msg_counter = [];
     // Copyright Kent Brewster 2008  CC-BY-SA-3
     // see http://kentbrewster.com/identica-badge for info
     // FIXME unfortunately \w is too lenient when livening URLs
+    origtext = text;
+    text = text.replace(/&#(\d+);/g, function(match, match2) {
+          return String.fromCharCode(+match2);
+    });
     text = text.replace(/((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
     //text = text.replace(/((http|https):\/\/|\!|@|#)(([&@#\/%?=~_|!:,.;]+)?[^\s]*)/g,
       function(sub, type, scheme, url, word) {
@@ -293,7 +297,7 @@ var msg_counter = [];
             moniker = '@' + word;
           } else {
             moniker = word.split('_'); // behaviour with underscores differs
-            if(type === '#') moniker = moniker.join('');
+            if (type === '#') moniker = moniker.join('');
             else word = moniker = word.toLowerCase();
           }
         }
@@ -309,7 +313,21 @@ var msg_counter = [];
             href = 'https://identi.ca/group/' + moniker;
             break;
           case '#': // link tags
-            href = sourceTag[source] + moniker;
+            console.log('in hashtag...');
+            if (source === 'mastodon') {  
+	      console.log('mastodon source url... ', d.tags[0].url);
+	      if (d.tags[0].url) {
+		console.log('we\'ve got d.tags.url:', d.tags[0].url);
+		console.log('word is ', word);
+		console.log('text is ', text);
+		console.log('origtext is ', origtext);
+		href = d.tags[0].url;
+              } else {
+                href = sourceTag[source] + moniker;
+              }
+            } else {
+              href = sourceTag[source] + moniker;
+            }
             break;
         }
         if (scheme) { // only urls will have scheme
@@ -428,12 +446,12 @@ var msg_counter = [];
     var created_date = getDate(d.created_at, lang);
     var iso_date = getISODate(d.created_at);
     //var ago_date = getTimeago(d.created_at, lang);
-    console.log('created date is '+ created_date);
+    //console.log('created date is '+ created_date);
 
     //var dt_ago = '<time class="timeago" datetime="'+iso_date+'" title="'+created_date+'">'+created_date+'</time>';
     var dt_ago = '<time class="timeago" datetime="'+iso_date+'">'+created_date+'</time>';
     msg += '<br /><span class="WEnotesub">';
-    console.log('.... dt_ago = '+dt_ago);
+    //console.log('.... dt_ago = '+dt_ago);
     if (tag === '_') {
       if (d.we_tags) {
         //console.log('%%% type = ' + d.we_source + ' num tags = ' + d.we_tags.length);
@@ -477,7 +495,11 @@ var msg_counter = [];
     } else if (d.we_source === 'connectoeglobal') {
       msg += 'connect.oeglobal';
     } else if (d.we_source === 'mastodon') {
-      msg += 'mastodon.oeru';
+      if (d.instance) {
+        msg += d.instance;
+      } else {
+        msg += 'mastodon.oeru';
+      }
     } else if (d.we_source === 'hypothesis') {
       msg += 'hypothes.is';
       //console.log("*** id = " + d.id);
@@ -522,18 +544,18 @@ var msg_counter = [];
 
   // find the current language setting, if any. Otherwise, return en_EN...
   function getLang() {
-    console.log('in getLang');
+    //console.log('in getLang');
     var wenlang = 'en_NZ';
     $('div.WEnotes').each(function() {
       var $details = $(this).attr('class').split(/\s+/);
       $.each($details, function(i, v) {
         if (v.indexOf('WEnotes-') === 0) {
-          console.log('+++++ v = ', v);
+          //console.log('+++++ v = ', v);
           var args = v.split('-');
           //console.log('+++++ args = '+JSON.stringify(args));
           if (args.length > 3) {
  	          wenlang = (args[4] !== '') ? args[4] : 'en_NZ';
-            console.log('found lang = '+wenlang);
+            //console.log('found lang = '+wenlang);
             if (wenlang == 'fr_FR') {
               $.extend($.timeago.settings.strings = {
                    // environ ~= about, it's optional
@@ -728,13 +750,13 @@ var msg_counter = [];
               if (tag === '_') {
                 button_text = "Plus d’actualités";
               }
-	            console.log('chose fr_FR: '+button_text);
+	            //console.log('chose fr_FR: '+button_text);
             } else {
               button_text = "More " + tag + " notes";
               if (tag === '_') {
                 button_text = "More notes";
 	            }
-	            console.log('chose not-fr_FR: '+button_text);
+	            //console.log('chose not-fr_FR: '+button_text);
       	    }
             $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
               ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
@@ -886,7 +908,7 @@ var msg_counter = [];
   // to hold individual subscriptions
   var subs = [];
   // for each WEnotes instance on the page
-  console.log("==== looking for WEnotes class...");
+  //console.log("==== looking for WEnotes class...");
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
     // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101-lida-fr_FR
@@ -914,13 +936,13 @@ var msg_counter = [];
           });
 
  	        wenlang = args[4];
-	        console.log('wenlang for WEnote: '+wenlang);
+	        //console.log('wenlang for WEnote: '+wenlang);
           // actually subscribe to the Faye services for the relevant combo
           combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
-          console.log('combo = ', combo);
+          //console.log('combo = ', combo);
           subs[i] = client.subscribe(combo, function(msg) {
-            console.log('i = ', i);
-            console.log('msg = ', msg);
+            //console.log('i = ', i);
+            //console.log('msg = ', msg);
             newPost(i, msg);
           });
         }
