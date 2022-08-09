@@ -889,9 +889,9 @@ var msg_counter = [];
   //console.log('starting WEnotes...');
 
   var msie = msieVersion();
-  $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
+  $('head').append('<link href="https://assets.oeru.org/css/font-awesome.min.css" rel="stylesheet" />');
   if (msie === 7) {
-    $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
+    $('head').append('<link href="https://assets.oeru.org/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
   $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
