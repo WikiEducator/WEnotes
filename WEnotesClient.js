@@ -2866,6 +2866,8 @@ var msg_counter = [];
               coursesite = 'pacificcourse.col';
           } else if (d.we_source_url === 'course.milll.ws') {
 	      coursesite = 'course.milll';
+          } else if (d.we_source_url === 'tepukenga.oerfoundation.org') {
+	      coursesite = 'course.tepukenga';
     	  } else {
     	      coursesite = 'course.oeru';
           }
