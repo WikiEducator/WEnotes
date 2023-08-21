@@ -2584,14 +2584,14 @@ var msg_counter = [];
       case 'bookmarks':
         timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.oeru.org/oeru_sscuttle.png';
+        profileIMG = 'https://assets.wikieducator.org/oeru_sscuttle.png';
         // d.created_at is on UTC, not NZ time... so compensate.
         d.created_at = d.we_timestamp;
         break;
       case 'hypothesis':
         feedURL = user.feed_url;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.oeru.org/hypothesis.png';
+        profileIMG = 'https://assets.wikieducator.org/hypothesis.png';
         timeLink = d.we_link;
         //console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
         //console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
@@ -2599,7 +2599,7 @@ var msg_counter = [];
       case 'medium':
         feedURL = user.feed_url;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.oeru.org/medium.png';
+        profileIMG = 'https://assets.wikieducator.org/medium.png';
         timeLink = d.we_link;
         //console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
         break;
@@ -2825,7 +2825,7 @@ var msg_counter = [];
     }
     // include an RSS Feed Icon link if a feed is defined
     if (feedURL) {
-      feedIcon = '<img src="https://assets.oeru.org/rss_mini.png" alt="RSS feed URL for this person" />';
+      feedIcon = '<img src="https://assets.wikieducator.org/rss_mini.png" alt="RSS feed URL for this person" />';
       msg += '&nbsp;&nbsp;<a href="' + feedURL + '">' + feedIcon + '</a>';
     }
     msg += '<br />';
@@ -3279,9 +3279,9 @@ var msg_counter = [];
   //console.log('starting WEnotes...');
 
   var msie = msieVersion();
-  $('head').append('<link href="https://assets.oeru.org/css/font-awesome.min.css" rel="stylesheet" />');
+  $('head').append('<link href="https://assets.wikieducator.org/css/font-awesome.min.css" rel="stylesheet" />');
   if (msie === 7) {
-    $('head').append('<link href="https://assets.oeru.org/css/font-awesome-ie7.min.css" rel="stylesheet" />');
+    $('head').append('<link href="https://assets.wikieducator.org/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
   $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
   // only create one Faye client per page
