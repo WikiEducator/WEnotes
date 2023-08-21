@@ -2443,12 +2443,12 @@ var wendivs = [];
 var WEnotes = {};
 var protocol = window.location.protocol + '//';
 // hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
+//var fayeURL = 'faye.oerfoundation.org/faye/';
+var fayeURL = 'faye.dev.oerfoundation.org/faye/';
 // scheme, host:port
 // include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
+//var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
+var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
 
 var msg_counter = [];
 
@@ -2524,6 +2524,7 @@ var msg_counter = [];
       url: couchHost + 'votes/_design/vote/_view/myvotes?key=' + encodeURIComponent(JSON.stringify(['WN'+tag, wgUserName])),
       cache: false,
       dataType: 'jsonp',
+      //dataType: 'json',
       success: function(d) {
         var i, l;
         if (d.rows) {
@@ -2553,7 +2554,8 @@ var msg_counter = [];
       community: 'https://community.oeru.org/u/',
       saylordiscourse: 'https://discourse.saylor.org/u/',
       connectoeglobal: 'https://connect.oeglobal.org/u/',
-      milllforum: 'https://forum.milll.ws/u/'
+      milllforum: 'https://forum.milll.ws/u/',
+      discourse: d.we_source_url + '/u/'
     };
     var sourceTag = {
       bookmarks: 'https://bookmarks.oeru.org/tags.php/',
@@ -2563,12 +2565,14 @@ var msg_counter = [];
       twitter: 'https://twitter.com/#!/search?q=%23',
       wikieducator: protocol + 'WikiEducator.org/',
       connectoeglobal: 'https://connect.oeglobal.org/u/',
-      milllforum: 'https://forum.milll.ws/u/'
+      milllforum: 'https://forum.milll.ws/u/',
+      discourse: d.we_source_url + '/u/'
     };
     // fix changed source tags...
     var source = d.we_source;
     if (source === 'saylor-discourse') source = 'saylordiscourse';
     if (source === 'connect.oeglobal') source = 'connectoeglobal';
+    if (source === 'disourse') source = 'discourse';
     var user = d.user || d.from_user;
 
     var text = d.text;
@@ -2641,6 +2645,8 @@ var msg_counter = [];
       case 'connectoeglobal':
       case 'saylordiscourse':
       case 'milllforum':
+      case 'discourse':
+      case 'disourse':
         profileURL = d.profile_url.replace('/users/', '/u/'); // change to default Discourse user profile path
         timeLink = d.we_link;
         break;
@@ -2681,7 +2687,8 @@ var msg_counter = [];
           // special case for WikiEducator user names
           if ((type === '@') && (source === 'wikieducator')) {
             moniker = word;
-          } else if ((type === '@') && ((source === 'forums') || (source === 'saylordiscourse') || (source === 'community'))) {
+          } else if ((type === '@') && ((source === 'forums') || (source === 'saylordiscourse') || 
+            (source === 'community') || (source === 'discourse') || (source === 'disourse'))) {
             moniker = word;
           } else if ((type === '@') && (source === 'mastodon')) {
             moniker = '@' + word;
@@ -2755,6 +2762,8 @@ var msg_counter = [];
 	    case 'ask':
 	    case 'feed':
 	    case 'groups':
+	    case 'disourse':
+	    case 'discourse':
 	    case 'community':
 	    case 'forums':
 	    case 'saylordiscourse':
@@ -2875,15 +2884,23 @@ var msg_counter = [];
     } else if (d.we_source === 'groups') {
       msg += 'groups.oeru';
     } else if (d.we_source === 'community') {
-      msg += 'community.oeru';
+      msg += 'forum.fossdle';
     } else if (d.we_source === 'forums') {
-      msg += 'forums.oeru';
+      msg += 'forum.oeru';
     } else if (d.we_source === 'milllforum') {
       msg += 'forum.milll';
     } else if (d.we_source === 'saylordiscourse') {
-      msg += 'forums.saylor';
+      msg += 'forum.saylor';
     } else if (d.we_source === 'connectoeglobal') {
       msg += 'connect.oeglobal';
+    } else if (d.we_source === 'discourse' || d.we_source === 'disourse') {
+      src = d.we_source_name;
+      if (d.we_source_name === 'forums') {
+	src = 'forum.oeru';
+      } else if (d.we_source_name === 'community') {
+	src = 'forum.fossdle';
+      }
+      msg += src;
     } else if (d.we_source === 'mastodon') {
       if (d.instance) {
         msg += d.instance;
@@ -3021,6 +3038,7 @@ var msg_counter = [];
         url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
+        //dataType: 'json',
         failure: function() {
           $wenmdi.hide();
           $wenm.show();
@@ -3114,6 +3132,7 @@ var msg_counter = [];
         url: url + makeCouchqs(options),
         cache: false,
         dataType: 'jsonp',
+        //dataType: 'json',
         failure: function() {
           // hope things are better later
           dx.timer = setTimeout(function() {$('div.WEnotes:first')
@@ -3199,6 +3218,7 @@ var msg_counter = [];
       url: couchHost + couchDB + '/_all_docs?include_docs=true&keys=' + encodeURIComponent(JSON.stringify(ids)),
       cache: false,
       dataType: 'jsonp',
+      //dataType: 'json',
       success: function(d) {
         var i, rowsl = d.rows.length;
         for (i=0; i<rowsl; i++) {
@@ -3215,6 +3235,7 @@ var msg_counter = [];
       url: couchHost + 'votes/_design/vote/_view/totals?group=true&startkey=' + encodeURIComponent(JSON.stringify(['WN' + tag])) + '&endkey=' + encodeURIComponent(JSON.stringify(['WN'+tag, {}])),
       cache: false,
       dataType: 'jsonp',
+      //dataType: 'json',
       success: function(d) {
         //console.log('in WEnotesTop!');
         var i, rowsl = d.rows.length,
