@@ -2875,8 +2875,6 @@ var msg_counter = [];
               coursesite = 'pacificcourse.col';
           } else if (d.we_source_url === 'course.milll.ws') {
 	      coursesite = 'course.milll';
-          } else if (d.we_source_url === 'tepukenga.oerfoundation.org') {
-	      coursesite = 'course.tepukenga';
     	  } else {
     	      coursesite = 'course.oeru';
           }
@@ -2900,7 +2898,11 @@ var msg_counter = [];
       if (d.we_source_name === 'forums') {
 	src = 'forum.oeru';
       } else if (d.we_source_name === 'community') {
-	src = 'forum.fossdle';
+	src = 'forum.fossdle'; 
+      } else if (d.we_source_name === 'milllforum') {
+	src = 'forum.milll';
+      } else if (d.we_source_name === 'connectoeglobal') {
+	src = 'connect.oeglobal';
       }
       msg += src;
     } else if (d.we_source === 'mastodon') {

@@ -508,7 +508,11 @@ var msg_counter = [];
       if (d.we_source_name === 'forums') {
 	src = 'forum.oeru';
       } else if (d.we_source_name === 'community') {
-	src = 'forum.fossdle';
+	src = 'forum.fossdle'; 
+      } else if (d.we_source_name === 'milllforum') {
+	src = 'forum.milll';
+      } else if (d.we_source_name === 'connectoeglobal') {
+	src = 'connect.oeglobal';
       }
       msg += src;
     } else if (d.we_source === 'mastodon') {
