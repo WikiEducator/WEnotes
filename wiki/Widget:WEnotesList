@@ -1,0 +1,11 @@
+<noinclude>Show specified WEnotes microblog items.
+
+== Example ==
+<nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|ids=1f435115,3e442135}}</nowiki>
+
+== Parameter ==
+;ids:comma separated list of WEnotes ids
+
+</noinclude><includeonly>
+<div class="WEnotes WEnotesList" data-ids="<!--{$ids|escape:'html'}-->"></div>
+</includeonly>

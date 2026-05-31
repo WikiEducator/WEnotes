@@ -1,5 +1,4 @@
-/* global wgUserName, wgArticleId, Faye */
-/* exported WEnotes */
+/* global Faye */
 /* WEnotes widget
  * Copyright 2012 Open Education Resource Foundation
  * Copyright 2026 Jim Tittsler and WikiEducator contributors
@@ -7,25 +6,14 @@
  */
 
 // variables made public to simplify debugging/monitoring
-var wendivs = [];
-var WEnotes = {};
-var msg_counter = [];
+window.wendivs = window.wendivs || [];
+window.msg_counter = window.msg_counter || [];
 
-(function () {
-    var weAPI = "/api.php",
-        protocol = window.location.protocol + "//";
-
-    function API(data, success, failure) {
-        data.action || (data.action = "query");
-        data.format || (data.format = "json");
-        return $.ajax({
-            url: window.wgServer + weAPI,
-            type: "POST",
-            data: data,
-            success: success,
-            error: failure,
-        });
-    }
+(function (mw, $) {
+    var protocol = window.location.protocol + "//";
+    var api = new mw.Api();
+    var wendivs = window.wendivs;
+    var msg_counter = window.msg_counter;
 
     function windowConv() {
         var url = $(this).closest(".WEnote").find("time").parent().attr("href");
@@ -58,13 +46,13 @@ var msg_counter = [];
             }
         }
         // try to get the tag from the div
-        if (wgUserName && tag) {
-            API({
+        if (mw.config.get("wgUserName") && tag) {
+            api.post({
                 action: "wevotes",
                 vopid: "WN" + tag.toLowerCase(),
                 vovid: id.slice(5),
                 vovote: notliked ? 1 : 0,
-                vopage: wgArticleId,
+                vopage: mw.config.get("wgArticleId"),
             });
             if (notliked) {
                 $(this)
@@ -85,7 +73,6 @@ var msg_counter = [];
 
     function formatMessage(d, tag, novoting) {
         var msg, userName, userFullname, i, aspect, origtext, feedIcon, src;
-        //var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         var sourceProfile = {
             bookmarks: "https://bookmarks.oeru.org/",
             hypothesis: "https://hypothes.is/",
@@ -147,15 +134,12 @@ var msg_counter = [];
                 profileURL = user.profile_url;
                 profileIMG = "/extensions/WEnotes/images/hypothesis.png";
                 timeLink = d.we_link;
-                //console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
-                //console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
                 break;
             case "medium":
                 feedURL = user.feed_url;
                 profileURL = user.profile_url;
                 profileIMG = "/extensions/WEnotes/images/medium.png";
                 timeLink = d.we_link;
-                //console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
                 break;
             case "wikieducator":
                 profileURL = protocol + "WikiEducator.org/User:" + user;
@@ -171,9 +155,7 @@ var msg_counter = [];
                 profileURL = user.statusnet_profile_url;
                 break;
             case "mastodon":
-                //timeLink = 'https://mastodon.oeru.org/@' + user.screen_name + '/' + d.id;
                 timeLink = d.uri;
-                //profileURL = 'https://mastodon.oeru.org/@' + user.screen_name;
                 profileURL = d.profile_url;
                 userFullname = user.name || user.screen_name;
                 if (userFullname == "undefined") {
@@ -205,7 +187,7 @@ var msg_counter = [];
             case "milllforum":
             case "discourse":
             case "disourse":
-                profileURL = d.profile_url.replace("/users/", "/u/"); // change to default Discourse user profile path
+                profileURL = d.profile_url.replace("/users/", "/u/");
                 timeLink = d.we_link;
                 break;
             case "chat":
@@ -215,7 +197,6 @@ var msg_counter = [];
                 userFullname = d.from_user_name;
                 userName = d.from_user;
                 profileURL = "";
-                //timeLink = '<a href="'+d.we_origin_schema+'://'+d.we_origin+'/'+d.we_origin_path+'">'+d.we_source_name+'</a>';
                 timeLink =
                     d.we_origin_schema + "://" + d.we_origin + d.we_origin_path;
                 break;
@@ -231,15 +212,12 @@ var msg_counter = [];
         });
         text = text.replace(
             /((http|https):\/\/|\!|@|#)(([\w_]+)?[^\s]*)/g,
-            //text = text.replace(/((http|https):\/\/|\!|@|#)(([&@#\/%?=~_|!:,.;]+)?[^\s]*)/g,
             function (sub, type, scheme, url, word) {
                 var moniker, parts;
                 // insights for this next regex: http://www.regular-expressions.info/possessive.html
                 var regex = /[.!?;,'")]+$/;
                 url = url.replace(regex, "");
                 sub = sub.replace(regex, "");
-                //console.log("====\nsub:" + sub + "\ntype:" + type +
-                // "\nscheme:" + scheme + "\nurl:" + url + "\nword:" + word);
                 if (!word) return sub; // just punctuation
                 var label = "";
                 var href = "";
@@ -384,12 +362,11 @@ var msg_counter = [];
         if (profileURL === "" && d.gravatar) {
             profileURL = "https://www.gravatar.com/" + d.gravatar;
         }
-        //
         if (isDefaultAvatar) {
             profileIMG =
                 "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
         }
-        //
+
         // set up the actual message published in the feed for each mention
         msg = '<div id="WEitf' + d._id + '" class="WEnote">';
         msg += '<div class="WEnotepic"><a href="' + profileURL + '"><img ';
@@ -408,10 +385,6 @@ var msg_counter = [];
         var mo = profileIMG.match(
             /https:\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i,
         );
-        //var mo = profileIMG.match(/(http|https):\/\/wikieducator\.org\/.*?\/(\d+)px-[^\/]+/i);
-        /*if (protocol == 'https://') {
-      mo = mo.replace('http:','https:');
-    }*/
         if (mo) {
             imgwidth = mo[1];
         }
@@ -434,7 +407,7 @@ var msg_counter = [];
             " width=" +
             imgwidth +
             '></a></div><div class="WEnotebody">';
-        // it doesn't make sense to line to a user in the case of WEnotes post from WordPress
+        // it doesn't make sense to link to a user in the case of WEnotes post from WordPress
         if (source === "wenotes_wp") {
             msg +=
                 "<b>" +
@@ -464,14 +437,9 @@ var msg_counter = [];
         msg += "<br />";
         msg += text;
         var lang = getLang();
-        //var dt = new Date(d.created_at);
-        //console.log('in flow, got lang '+lang);
         var created_date = getDate(d.created_at, lang);
         var iso_date = getISODate(d.created_at);
-        //var ago_date = getTimeago(d.created_at, lang);
-        //console.log('created date is '+ created_date);
 
-        //var dt_ago = '<time class="timeago" datetime="'+iso_date+'" title="'+created_date+'">'+created_date+'</time>';
         var dt_ago =
             '<time class="timeago" datetime="' +
             iso_date +
@@ -479,10 +447,8 @@ var msg_counter = [];
             created_date +
             "</time>";
         msg += '<br /><span class="WEnotesub">';
-        //console.log('.... dt_ago = '+dt_ago);
         if (tag === "_") {
             if (d.we_tags) {
-                //console.log('%%% type = ' + d.we_source + ' num tags = ' + d.we_tags.length);
                 msg += '<span class="WEtags">';
                 for (i = 0; i < d.we_tags.length; i++) {
                     msg += "#" + d.we_tags[i] + "&nbsp;";
@@ -494,10 +460,8 @@ var msg_counter = [];
         if (d.we_source === "feed") {
             msg += '<span title="' + d.we_feed + '">blog</span>';
         } else if (d.we_source === "wenotes_wp" || d.we_source === "course") {
-            //console.log('figuring out source attribution: ', d);
             var coursesite = "course.oeru";
             if (typeof d.we_source_url != "undefined") {
-                // console.log('we have a source_url: ', d.we_source_url);
                 if (d.we_source_url === "course.oeglobal.org") {
                     coursesite = "course.oeglobal";
                 } else if (d.we_source_url === "pacificopencourses.col.org") {
@@ -512,7 +476,6 @@ var msg_counter = [];
                     coursesite = "course.oeru";
                 }
             }
-            //console.log('we got a message: ', coursesite);
             msg += coursesite;
         } else if (d.we_source === "groups") {
             msg += "groups.oeru";
@@ -546,8 +509,6 @@ var msg_counter = [];
             }
         } else if (d.we_source === "hypothesis") {
             msg += "hypothes.is";
-            //console.log("*** id = " + d.id);
-            //console.log("dt = " + dt + ", dt_ago = " + dt_ago);
         } else {
             msg += d.we_source;
         }
@@ -559,7 +520,7 @@ var msg_counter = [];
             '" style="text-decoration: none;" target="_wenotes">' +
             dt_ago +
             "</a>";
-        if (!novoting && wgUserName) {
+        if (!novoting && mw.config.get("wgUserName")) {
             var starClass = d.favorited ? "icon-star" : "icon-star-empty";
             var starTitle = d.favorited ? "unfavorite" : "favorite";
             msg +=
@@ -571,7 +532,7 @@ var msg_counter = [];
         }
         msg += '&nbsp;<span class="wevtct"></span>';
         // add the "sysop-only" links to delete the mention
-        if ($.inArray("sysop", window.wgUserGroups) > -1) {
+        if ($.inArray("sysop", mw.config.get("wgUserGroups")) > -1) {
             msg +=
                 "&nbsp;&nbsp;&nbsp;" +
                 '<a href="#" class="WEnd" id="WEnd_' +
@@ -594,20 +555,18 @@ var msg_counter = [];
 
         var apiParams = {
             action: "wenotes",
-            nomode: "get",
-            noafter: dx.last,
-            format: "json",
+            mode: "get",
+            after: dx.last,
         };
         if (tag !== "_") {
-            apiParams.notag = taglc;
+            apiParams.tag = taglc;
         }
         if (newstylepage) {
-            apiParams.nopage = site_id + "-" + path_id;
+            apiParams.page = site_id + "-" + path_id;
         }
 
-        API(
-            apiParams,
-            function (data) {
+        api.post(apiParams)
+            .done(function (data) {
                 try {
                     if (
                         data &&
@@ -632,13 +591,12 @@ var msg_counter = [];
                         pollForUpdates(ix);
                     }, 10000);
                 }
-            },
-            function () {
+            })
+            .fail(function () {
                 dx.pollTimer = setTimeout(function () {
                     pollForUpdates(ix);
                 }, 10000);
-            },
-        );
+            });
     }
 
     function getMore(event) {
@@ -656,21 +614,19 @@ var msg_counter = [];
             typeof site_id !== "undefined" && typeof path_id !== "undefined";
         var apiParams = {
             action: "wenotes",
-            nomode: "get",
-            nobefore: wendivs[ix].first,
-            nolimit: count,
-            format: "json",
+            mode: "get",
+            before: wendivs[ix].first,
+            limit: count,
         };
         if (tag !== "_") {
-            apiParams.notag = taglc;
+            apiParams.tag = taglc;
         }
         if (newstylepage) {
-            apiParams.nopage = site_id + "-" + path_id;
+            apiParams.page = site_id + "-" + path_id;
         }
 
-        API(
-            apiParams,
-            function (data) {
+        api.post(apiParams)
+            .done(function (data) {
                 if (!data || !data.wenotes || !data.wenotes.rows) {
                     return;
                 }
@@ -706,12 +662,11 @@ var msg_counter = [];
                 if (rows.length < count) {
                     $(mid).hide();
                 }
-            },
-            function () {
+            })
+            .fail(function () {
                 $wenmdi.hide();
                 $wenm.show();
-            },
-        );
+            });
         return false;
     }
 
@@ -732,20 +687,18 @@ var msg_counter = [];
 
         var apiParams = {
             action: "wenotes",
-            nomode: "get",
-            nolimit: count,
-            format: "json",
+            mode: "get",
+            limit: count,
         };
         if (tag !== "_") {
-            apiParams.notag = taglc;
+            apiParams.tag = taglc;
         }
         if (newstylepage) {
-            apiParams.nopage = site_id + "-" + path_id;
+            apiParams.page = site_id + "-" + path_id;
         }
 
-        API(
-            apiParams,
-            function (data) {
+        api.post(apiParams)
+            .done(function (data) {
                 if (!data || !data.wenotes || !data.wenotes.rows) {
                     return;
                 }
@@ -768,9 +721,9 @@ var msg_counter = [];
                     if ($("#WEnotesMoreDiv" + ix).length === 0) {
                         var button_text;
                         if (getLang() === "fr_FR") {
-                            button_text = "Plus d’actualités " + tag;
+                            button_text = "Plus d'actualités " + tag;
                             if (tag === "_") {
-                                button_text = "Plus d’actualités";
+                                button_text = "Plus d'actualités";
                             }
                         } else {
                             button_text = "More " + tag + " notes";
@@ -829,75 +782,77 @@ var msg_counter = [];
                 dx.pollTimer = setTimeout(function () {
                     pollForUpdates(ix);
                 }, 10000);
-            },
-            function () {
+            })
+            .fail(function () {
                 dx.timer = setTimeout(function () {
                     $("div.WEnotes:first").triggerHandler("WEnotes", [dx.tag]);
                 }, 30000);
-            },
-        );
+            });
     }
 
-    function WEnotesList(div, ids) {
+    function loadNotesList($div, ids) {
         if (typeof ids === "string") {
             ids = ids.split(",");
         }
+        ids = $.grep(ids, function (id) {
+            return $.trim(id) !== "";
+        });
         if (!ids || ids.length === 0) return;
 
-        $.ajax({
-            url: window.wgServer + weAPI,
-            type: "POST",
-            data: {
-                action: "wenotes",
-                nomode: "get",
-                noids: ids.join(","),
-                format: "json",
-            },
-            dataType: "json",
-            success: function (data) {
-                if (data && data.wenotes && data.wenotes.rows) {
-                    var rows = data.wenotes.rows;
-                    for (var i = 0; i < rows.length; i++) {
-                        $(div).append(formatMessage(rows[i].doc, "_", true));
-                    }
+        api.post({
+            action: "wenotes",
+            mode: "get",
+            ids: ids.join(","),
+        }).done(function (data) {
+            if (data && data.wenotes && data.wenotes.rows) {
+                var rows = data.wenotes.rows;
+                for (var i = 0; i < rows.length; i++) {
+                    $div.append(formatMessage(rows[i].doc, "_", true));
                 }
-            },
+            }
         });
     }
 
-    function WEnotesTop(div, tag, cnt) {
+    // Self-initialise WEnotesList divs
+    $("div.WEnotesList").each(function () {
+        var $div = $(this);
+        var ids = $div.data("ids");
+        if (ids) {
+            loadNotesList($div, String(ids));
+        }
+    });
+
+    // Self-initialise WEnotesTop divs
+    $("div.WEnotesTop").each(function () {
+        var $div = $(this);
+        var tag = $div.data("tag");
+        var cnt = parseInt($div.data("cnt"), 10) || 5;
+        if (!tag) return;
         var taglc = tag.toLowerCase();
-        $.ajax({
-            url: window.wgServer + weAPI,
-            type: "POST",
-            data: {
-                action: "wevotes",
-                vopid: "WN" + taglc,
-                vomode: "get",
-                format: "json",
-            },
-            dataType: "json",
-            success: function (data) {
-                if (data && data.wevotes && data.wevotes.totals) {
-                    var totals = data.wevotes.totals;
-                    var unsorted = [];
-                    for (var vid in totals) {
-                        if (totals[vid] > 0) {
-                            unsorted.push([totals[vid], vid]);
-                        }
+        api.post({
+            action: "wevotes",
+            vopid: "WN" + taglc,
+            vomode: "get",
+        }).done(function (data) {
+            if (data && data.wevotes && data.wevotes.totals) {
+                var totals = data.wevotes.totals;
+                var unsorted = [];
+                for (var vid in totals) {
+                    if (totals[vid] > 0) {
+                        unsorted.push([totals[vid], vid]);
                     }
-                    unsorted.sort(function (a, b) {
-                        return b[0] - a[0];
-                    });
-                    var sorted = [];
-                    for (var i = 0; i < unsorted.length && i < cnt; i++) {
-                        sorted.push(unsorted[i][1]);
-                    }
-                    WEnotesList(div, sorted);
                 }
-            },
+                unsorted.sort(function (a, b) {
+                    return b[0] - a[0];
+                });
+                var sorted = [];
+                for (var i = 0; i < unsorted.length && i < cnt; i++) {
+                    sorted.push(unsorted[i][1]);
+                }
+                loadNotesList($div, sorted);
+            }
         });
-    }
+    });
 
     function newPost(ix, message) {
         if (message._id.charAt(0) === "_") {
@@ -920,111 +875,42 @@ var msg_counter = [];
 
     function WEnotesHandler(event, tag) {
         $.each(wendivs, function (i, v) {
-            if (tag && v.tag && v.tag.toLowerCase() !== tag.toLowerCase()) {
+            // Skip if tag filter is active and neither the widget tag matches
+            // nor the widget is showing all tags (tag '_' is a wildcard).
+            if (
+                tag &&
+                v.tag &&
+                v.tag !== "_" &&
+                v.tag.toLowerCase() !== tag.toLowerCase()
+            ) {
                 return;
             }
-            WEnotes(i);
+            // If a tag is supplied this is a post notification — use
+            // pollForUpdates to fetch and prepend only the new note
+            // immediately rather than re-fetching the full list.
+            // Without a tag it is an initial load, so use WEnotes().
+            if (tag) {
+                if (wendivs[i].pollTimer) {
+                    clearTimeout(wendivs[i].pollTimer);
+                }
+                pollForUpdates(i);
+            } else {
+                WEnotes(i);
+            }
         });
         return false;
     }
 
-    // return MSIE major version number (or null)
-    function msieVersion() {
-        var m = /MSIE (\d+)/.exec(navigator.userAgent);
-        if (m) {
-            return parseInt(m[1], 10);
-        }
-        return null;
-    }
-
-    // start the WEnotes process
-    //console.log('starting WEnotes...');
-
-    var msie = msieVersion();
-    $("head").append(
-        '<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />',
-    );
-    if (msie === 7) {
-        $("head").append(
-            '<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />',
-        );
-    }
-    $("head").append(
-        '<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />',
-    );
-
-    $("div.WEnotes").each(function () {
-        var $thisd = $(this);
-        var classes = $(this).attr("class").split(/\s+/);
-        $.each(classes, function (i, v) {
-            if (v.indexOf("WEnotes-") === 0) {
-                var tag;
-                var args = v.split("-", 5);
-                if (args.length > 2) {
-                    tag = args[2];
-                    wendivs.push({
-                        $d: $thisd,
-                        count: args[1],
-                        tag: tag,
-                        context: args[3],
-                        language: args[4],
-                        last: "2011-01-01T00:00:00.000Z",
-                        first: "2999-12-31T23:59:59.999Z",
-                        moreCount: 20,
-                    });
-
-                    wenlang = args[4];
-                }
-            }
-        });
-    });
-
-    $("div.WEnotes,div.WEnotesList")
-        .on("click", ".icon-star, .icon-star-empty", like)
-        .on("click", ".icon-mail-reply, .icon-th-list", windowConv)
-        .on("click", "a.WEnd", function () {
-            var id = $(this).attr("id").split("_")[1];
-            $.ajax({
-                url: weAPI,
-                type: "POST",
-                dataType: "json",
-                data: {
-                    action: "wenotes",
-                    noid: id,
-                    format: "json",
-                },
-                success: function () {
-                    console.log("deleting mention designated by " + id);
-                    $("#WEitf" + id).hide("fast");
-                },
-                failure: function () {
-                    alert("unable to delete");
-                },
-            });
-            return false; // we got this
-        });
-
-    $("div.WEnotes").on("WEnotes", WEnotesHandler);
-
-    if (wendivs.length) {
-        console.log("wendivs has length " + wendivs.length);
-        $("div.WEnotes:first").triggerHandler("WEnotes");
-    }
-
-    // find the current language setting, if any. Otherwise, return en_EN...
+    // find the current language setting, if any. Otherwise, return en_NZ
     function getLang() {
-        //console.log('in getLang');
         var wenlang = "en_NZ";
         $("div.WEnotes").each(function () {
             var $details = $(this).attr("class").split(/\s+/);
             $.each($details, function (i, v) {
                 if (v.indexOf("WEnotes-") === 0) {
-                    //console.log('+++++ v = ', v);
                     var args = v.split("-");
-                    //console.log('+++++ args = '+JSON.stringify(args));
                     if (args.length > 3) {
                         wenlang = args[4] !== "" ? args[4] : "en_NZ";
-                        //console.log('found lang = '+wenlang);
                         if (wenlang == "fr_FR") {
                             $.extend(
                                 ($.timeago.settings.strings = {
@@ -1082,7 +968,54 @@ var msg_counter = [];
         return date || "";
     }
 
-    window.WEnotes.formatMessage = formatMessage;
-    window.WEnotes.list = WEnotesList;
-    window.WEnotes.top = WEnotesTop;
-})();
+    // Initialise all WEnotes divs on the page
+    $("div.WEnotes").each(function () {
+        var $thisd = $(this);
+        var classes = $(this).attr("class").split(/\s+/);
+        $.each(classes, function (i, v) {
+            if (v.indexOf("WEnotes-") === 0) {
+                var tag;
+                var args = v.split("-", 5);
+                if (args.length > 2) {
+                    tag = args[2];
+                    wendivs.push({
+                        $d: $thisd,
+                        count: args[1],
+                        tag: tag,
+                        context: args[3],
+                        language: args[4],
+                        last: "2011-01-01T00:00:00.000Z",
+                        first: "2999-12-31T23:59:59.999Z",
+                        moreCount: 20,
+                    });
+                }
+            }
+        });
+    });
+
+    $("div.WEnotes,div.WEnotesList")
+        .on("click", ".icon-star, .icon-star-empty", like)
+        .on("click", ".icon-mail-reply, .icon-th-list", windowConv)
+        .on("click", "a.WEnd", function () {
+            var id = $(this).attr("id").split("_")[1];
+            api.postWithEditToken({
+                action: "wenotes",
+                id: id,
+            })
+                .done(function () {
+                    console.log("deleting mention designated by " + id);
+                    $("#WEitf" + id).hide("fast");
+                })
+                .fail(function () {
+                    alert("unable to delete");
+                });
+            return false; // we got this
+        });
+
+    $("div.WEnotes").on("WEnotes", WEnotesHandler);
+
+    if (wendivs.length) {
+        console.log("wendivs has length " + wendivs.length);
+        $("div.WEnotes:first").triggerHandler("WEnotes");
+    }
+})(mediaWiki, jQuery);

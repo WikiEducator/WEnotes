@@ -1,15 +1,47 @@
-.WEnote {margin: 2px;}
-.WEnotebody {margin-left: 53px;}
-.WEnotepic {float: left; width: 48px;}
-.WEnotepic img {border-radius: 3px; float: right; border: none;}
-.WEnoteuser {color:#999}
-.WEnotesub {color:#999; font-size: smaller;}
-.WEnotes a[href^="https://"] {background: none!important;}
-.WEnoteReply {margin-left: 53px;}
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css");
 
-.WEnotesMore {margin-left:53px;}
-.WEnotesMore img {display: none!important; margin-left: 20px; width: 16px; height: 16px;}
+.WEnote {
+    margin: 2px;
+}
+.WEnotebody {
+    margin-left: 53px;
+}
+.WEnotepic {
+    float: left;
+    width: 48px;
+}
+.WEnotepic img {
+    border-radius: 3px;
+    float: right;
+    border: none;
+}
+.WEnoteuser {
+    color: #999;
+}
+.WEnotesub {
+    color: #999;
+    font-size: smaller;
+}
+.WEnotes a[href^="https://"] {
+    background: none !important;
+}
+.WEnoteReply {
+    margin-left: 53px;
+}
 
-.icon-mail-reply, .icon-th-list, .icon-star, .icon-star-empty {
-  cursor: pointer;}
+.WEnotesMore {
+    margin-left: 53px;
+}
+.WEnotesMore img {
+    display: none !important;
+    margin-left: 20px;
+    width: 16px;
+    height: 16px;
+}
 
+.icon-mail-reply,
+.icon-th-list,
+.icon-star,
+.icon-star-empty {
+    cursor: pointer;
+}

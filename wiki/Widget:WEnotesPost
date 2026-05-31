@@ -1,0 +1,19 @@
+<noinclude>A WEnotes post form.
+== Usage ==
+<nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|tag=wikieducator|button=Post it!|leftmargin=0|anonymous=You must login to post.|language=fr_FR}}</nowiki>
+
+== Parameters ==
+;tag:tag to post to (default: ''wikieducator'')
+;button:text for the submit button (default: ''Post a WEnote'')
+;leftmargin:left margin in pixels (default: aligns with WEnotes text from [[Widget:WEnotes]])
+;anonymous:prompt to display when user is not logged in instead of default login link
+;language:specify a language for the WEnotes posting interface (including button text) - defaults to en_NZ (NZ English), but fr_FR (French) is also available
+
+</noinclude><includeonly>
+<div class="WEnotes WEnotesPost"
+     data-tag="<!--{$tag|escape:'html'}-->"
+     data-button="<!--{$button|escape:'html'}-->"
+     data-leftmargin="<!--{$leftmargin|escape:'html'}-->"
+     data-lang="<!--{$lang|escape:'html'}-->"
+     data-anonymous="<!--{$anonymous|escape:'html'}-->"></div>
+</includeonly>

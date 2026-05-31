@@ -22,8 +22,51 @@ $wgExtensionCredits['parserhook'][] = array(
 
 $wgAPIModules['wenotes'] = 'APIWEnotes';
 
+$wgResourceModules['ext.WEnotes.timeago'] = array(
+	'scripts'       => array( 'jquery.timeago.js' ),
+	'dependencies'  => array( 'jquery' ),
+	'localBasePath' => __DIR__,
+	'remoteExtPath' => 'WEnotes',
+);
+
+$wgResourceModules['ext.WEnotes'] = array(
+	'scripts'       => array( 'WEnotes.js' ),
+	'styles'        => array( 'WEnotes.css' ),
+	'dependencies'  => array( 'mediawiki.api', 'mediawiki.api.edit', 'ext.WEnotes.timeago' ),
+	'localBasePath' => __DIR__,
+	'remoteExtPath' => 'WEnotes',
+);
+
+$wgResourceModules['ext.WEnotes.post'] = array(
+	'scripts'       => array( 'WEnotesPost.js' ),
+	'dependencies'  => array( 'mediawiki.api', 'mediawiki.api.edit' ),
+	'localBasePath' => __DIR__,
+	'remoteExtPath' => 'WEnotes',
+);
+
+$wgHooks['ParserAfterTidy'][] = 'fnWEnotesParserAfterTidy';
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'fnWEnotesSchemaUpdates';
 $wgHooks['ArticleSaveComplete'][] = 'fnWEnotesArticleSaveComplete';
+
+function fnWEnotesParserAfterTidy( &$parser, &$text ) {
+	// All WEnotes widget divs share "WEnotes" as their first CSS class, so a
+	// single strpos() identifies any page containing a WEnotes widget.
+	// MW propagates ParserOutput module registrations to OutputPage so RL
+	// emits them on the initial page render, keeping cost off unrelated pages.
+	if ( strpos( $text, 'class="WEnotes ' ) === false ) {
+		return true;
+	}
+
+	// All widgets need the main module (styles + feed script).
+	$parser->getOutput()->addModuleStyles( 'ext.WEnotes' );
+	$parser->getOutput()->addModules( 'ext.WEnotes' );
+
+	// The post form widget also needs its own script module.
+	if ( strpos( $text, 'WEnotesPost' ) !== false ) {
+		$parser->getOutput()->addModules( 'ext.WEnotes.post' );
+	}
+	return true;
+}
 
 function fnWEnotesSchemaUpdates( DatabaseUpdater $updater ) {
 	$dbType = $updater->getDB()->getType();
@@ -194,7 +237,7 @@ class APIWEnotes extends ApiQueryBase {
 	}
 
 	public function __construct( $query, $moduleName ) {
-		parent :: __construct( $query, $moduleName, 'no' );
+		parent :: __construct( $query, $moduleName, '' );
 	}
 
 	public function execute() {
@@ -597,8 +640,8 @@ class APIWEnotes extends ApiQueryBase {
 
 	protected function getExamples() {
 		return array (
-			'api.php?action=wenotes&notag=wikieducator&notext=First%20post',
-			'api.php?action=wenotes&nomode=get&notag=wikieducator&nolimit=5',
+			'api.php?action=wenotes&tag=wikieducator&text=First%20post',
+			'api.php?action=wenotes&mode=get&tag=wikieducator&limit=5',
 		);
 	}
 

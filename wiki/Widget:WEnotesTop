@@ -1,0 +1,12 @@
+<noinclude>Show most popular WEnotes microblog items for a tag.
+
+== Example ==
+<nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|tag=ocl4ed|cnt=3}}</nowiki>
+
+== Parameters ==
+;tag:WEnotes tag to display
+;cnt:maximum number of items to show
+
+</noinclude><includeonly>
+<div class="WEnotes WEnotesTop" data-tag="<!--{$tag|escape:'html'}-->" data-cnt="<!--{$cnt|escape:'html'}-->"></div>
+</includeonly>

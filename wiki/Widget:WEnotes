@@ -1,0 +1,27 @@
+<noinclude>An aggregated miniblog feed from [http://WikiEducator.org/WEnotes WikiEducator], [http://twitter.com/ Twitter], [http://moodle.wikieducator.org/ Moodle], and learner blogs.
+
+== Usage ==
+<nowiki>{{#widget:</nowiki>{{PAGENAME}}<nowiki>|tag=wikieducator|count=20|context=path|language=fr_FR}}</nowiki>
+
+== Parameters ==
+;tag:tag to follow (defaults to ''wikieducator''), it must not be prefixed with '#'.
+;count:number of items to display (defaults to 20)
+;context: (optional) set ''context=path'' if you want your feed and posts from a given MediaWiki or WordPress WEnotes instance to be indexed to a specific page (URL path) on which it appears and not just to a tag. This allows for page-level discussion context, although page level posts will also appear in the relevant tag feed, too. 
+;language: (optional) specify a language for the WEnotes feed interface (including button text) - defaults to en_NZ (NZ English), but fr_FR (French) is also available.
+
+
+== Implementation Note ==
+The feed is inserted into a named <nowiki><DIV></nowiki> on the page, allowing adding style elements around it.
+
+</noinclude><includeonly>
+<div class="WEnotes WEnotes-<!--{$count|escape:'quotes'}-->-<!--{$tag|escape:'quotes'}-->-<!--{$context|escape:'quotes'}-->-<!--{$language|escape:'quotes'}-->" 
+    data-context="<!--{$context|escape:'quotes'}-->" 
+    data-tag="<!--{$tag|escape:'quotes'}-->" 
+    data-count="<!--{$count|escape:'quotes'}-->" 
+    data-lang="<!--{$language|escape:'quotes'}-->"><img class="WEnotesSpinner" src="/skins/common/images/ajax-loader.gif" alt="Loading..." style="margin-left: 53px;" /></div>
+<script type="text/javascript">/*<![CDATA[*/
+mw.loader.using( 'ext.WEnotes', function () {
+  $( 'div.WEnotes:first' ).triggerHandler( 'WEnotes' );
+} );
+/*]]>*/</script>
+</includeonly>
