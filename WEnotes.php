@@ -266,7 +266,7 @@ class APIWEnotes extends ApiQueryBase {
 			$conds = array();
 			$tables = array( 'wenotes' );
 			$join_conds = array();
-			
+
 			if ( isset( $params['tag'] ) && $params['tag'] !== '_' ) {
 				$tables[] = 'wenotes_tags';
 				$conds['wet_tag'] = strtolower( $params['tag'] );
@@ -407,8 +407,8 @@ class APIWEnotes extends ApiQueryBase {
 		$inreplyroot = '';
 		if (isset($params['root'])) {
 			$inreplyroot = preg_replace('/[^a-z0-9]/i',
-				'', $params['reply']);
-			if ($inreplyroot <> $params['root']) {
+				'', $params['root']);
+			if ($inreplyroot !== $params['root']) {
 				$this->dieUsage('invalid reply id',
 					'invalidreplyid');
 			}
@@ -548,7 +548,7 @@ class APIWEnotes extends ApiQueryBase {
 			error_log('setting value for wenlang '.$params['wenlang']);
 			$result->addValue('wenlang', $params['wenlang'], true);
 		} else {
-			error_log('no value for wenlang...');				
+			error_log('no value for wenlang...');
 		}
 	}
 
@@ -571,6 +571,7 @@ class APIWEnotes extends ApiQueryBase {
 			),
 			'ids' => null,
 			'page' => null,
+			'wenlang' => null,
 		);
 	}
 
