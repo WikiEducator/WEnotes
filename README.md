@@ -1,5 +1,4 @@
-WEnotes
-====
+# WEnotes
 
 WEnotes consists of several parts:
 
@@ -15,32 +14,30 @@ WEnotes consists of several parts:
     * various Discourse instances
 
 * a Mediawiki extension
-    * verifies user is logged in
-    * saves local post
+  * provides API access to the WEnotes feed
+  * verifies user is logged in
+  * saves local post
+  * allows saving personal favorites
 
-* Mediawiki Widget for collecting local microblog postings
-
-* Mediawiki Widget for displaying an integrated display of all notes
-
+* MediaWiki widgets for:
+  * collecting local microblog posts
+  * displaying an integrated display of all notes
+  * or all notes matching a specific tag
+  * displaying a specific range of notes
 
 WEnotes harvests posts from a variety of sources and aggregates them
-in a [CouchDB](http://couchdb.apache.org/) instance. Some sources are
-streamed in near real time and others are polled periodically.  A
-[Faye](http://faye.jcoglan.com/) publish-subscribe messaging system
-posts the messages to interested clients.
+in the MediaWiki database. Some sources are
+streamed in near real time and others are polled periodically.
+Clients periodically poll the MediaWiki API for new posts.
 
 This repository includes the client side tools for displaying and
 capturing notes. Check the
-[WEnotes-tools](https://git.oeru.org/oeru/wenotes-tools/)
-repository for the harvesting tools. Also see [WEnotes-server](https://git.oeru.org/oeru/wenotes-server)
-for the stack of tools which manages the distribution of the aggregated feeds.
-If you want to host your own instance of this, we encourage you to use our [Docker Compose
-hosting configuration](https://git.oeru.org/oeru/wenotes-docker)
+[WEnotes-tools](https://github.com/WikiEducator/wenotes-tools/)
+repository for the harvesting tools.
 
+## Building
 
-Notes:
-
-* to clone this archive, you must (after the initial clone) run
-    git submodule init
-    git submodule update
+After cloning this repository, you must:
 * ensure you install the set of Node JS dependencies by running `npm install` in this directory, which will install the libraries (and their dependencies) listed in package.json
+* run `make` to build minified versions of the client side tools
+* you can then optionally remove the `node_modules` tree
