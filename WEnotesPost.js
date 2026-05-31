@@ -1,5 +1,6 @@
 /* WEnotes widget
  * Copyright 2012-2016 Open Education Resource Foundation
+ * Copyright 2026 Jim Tittsler and WikiEducator contributors
  * Available under CC-BY license.
  */
 /* global wgPageName */
@@ -57,6 +58,8 @@ function WEnotesPost(id, tag, button, leftmargin, anonymous) {
           if ('error' in d) {
             alert('Unable to save submission:\n  ' +
               d.error.info);
+          } else {
+            $('div.WEnotes').trigger('WEnotes', [tag]);
           }
           $button.removeAttr('disabled');
           $text.val('');

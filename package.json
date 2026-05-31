@@ -1,19 +1,18 @@
 {
   "name": "WEnotes",
-  "version": "0.2.1",
+  "version": "0.9.0",
   "description": "microblog aggregator client",
   "homepage": "http://WikiEducator.org/Extension:WEnotes",
   "repository": {
     "type": "git",
-    "url": "https://git.gitorious.org/wikieducator/wenotes.git"
+    "url": "https://github.com/WikiEducator/WEnotes.git"
   },
   "license": "CC-BY-SA-3.0",
   "author": {
     "name": "Jim Tittsler",
-    "email": "jim@oerfoundation.org"
+    "email": "jimt@oer.me"
   },
   "devDependencies": {
-    "faye": "0.8.9",
     "timeago": "1.6.7",
     "uglify": "^0.1.5",
     "yargs": "^16.2.0"

@@ -1,72 +1,19 @@
 /* global wgUserName, wgArticleId, Faye */
 /* exported WEnotes */
-/* IE console shim */
-if ( ! window.console ) {
-  (function() {
-    var names = ["log", "debug", "info", "warn", "error",
-        "assert", "dir", "dirxml", "group", "groupEnd", "time",
-        "timeEnd", "count", "trace", "profile", "profileEnd"],
-        i, l = names.length;
-
-    window.console = {};
-
-    for ( i = 0; i < l; i++ ) {
-      window.console[ names[i] ] = function() {};
-    }
-  }());
-}
-
-/* shim for toISOString()
- */
-
-if ( !Date.prototype.toISOString ) {
-  (function() {
-    function pad(number) {
-      var r = String(number);
-      if (r.length === 1) {
-        r = '0' + r;
-      }
-      return r;
-    }
-
-    Date.prototype.toISOString = function() {
-      return this.getUTCFullYear() +
-        '-' + pad(this.getUTCMonth() + 1) +
-        '-' + pad(this.getUTCDate()) +
-        'T' + pad(this.getUTCHours()) +
-        ':' + pad(this.getUTCMinutes()) +
-        ':' + pad(this.getUTCSeconds()) +
-        '.' + String((this.getUTCMilliseconds()/1000).toFixed(3)).slice(2, 5) +
-        'Z';
-      };
-
-  }());
-}
-
 /* WEnotes widget
  * Copyright 2012 Open Education Resource Foundation
+ * Copyright 2026 Jim Tittsler and WikiEducator contributors
  * Available under CC-BY-SA license.
  */
 
 // variables made public to simplify debugging/monitoring
 var wendivs = [];
 var WEnotes = {};
-var protocol = window.location.protocol + '//';
-// hard coded locations of things
-var fayeURL = 'faye.oerfoundation.org/faye/';
-//var fayeURL = 'faye.dev.oerfoundation.org/faye/';
-// scheme, host:port
-// include trailing / on URL...
-var couchHost = 'couch.oerfoundation.org/', couchDB = 'mentions';
-//var couchHost = 'couch.dev.oerfoundation.org/', couchDB = 'mentions';
-
 var msg_counter = [];
 
 (function () {
-  var couchURL = protocol + couchHost + couchDB + '/_design/messages/_view/tag_time?',
-      couchURLall = protocol + couchHost + couchDB + '/_design/messages/_view/time_unique?',
-      couchURLpath = protocol + couchHost + couchDB + '/_design/messages/_view/page_time?',
-      weAPI = '/api.php';
+  var weAPI = '/api.php',
+      protocol = window.location.protocol + '//';
 
 
   function API(data, success, failure) {
@@ -91,10 +38,16 @@ var msg_counter = [];
     var mo, cl, tag = '';
     var id = $(this).closest('.WEnote').attr('id');
     var notliked = $(this).hasClass('icon-star-empty');
-    cl = $('#' + id).closest('.WEnotes').attr('class');
-    mo = /WEnotes-\d+-([^ ]+)/.exec(cl);
-    if (mo) {
-      tag = mo[1];
+    var $parent = $('#' + id).closest('.WEnotes');
+    var ix = -1;
+    $.each(wendivs, function(index, item) {
+      if (item.$d[0] === $parent[0]) {
+        ix = index;
+        return false;
+      }
+    });
+    if (ix !== -1) {
+      tag = wendivs[ix].tag;
     }
     if (tag === '_') {
       cl = $('#' + id + ' .WEtags').text();
@@ -127,28 +80,7 @@ var msg_counter = [];
     return false;
   }
 
-  function getFaves(tag) {
-    if (tag === '_') return;
-    tag = tag.toLowerCase();
-    $.ajax({
-      url: couchHost + 'votes/_design/vote/_view/myvotes?key=' + encodeURIComponent(JSON.stringify(['WN'+tag, wgUserName])),
-      cache: false,
-      dataType: 'jsonp',
-      //dataType: 'json',
-      success: function(d) {
-        var i, l;
-        if (d.rows) {
-          l = d.rows.length;
-          for (i=0; i<l; i++) {
-            if (d.rows[i].value[1]) {
-              $('#WEitf'+d.rows[i].value[0]+' .icon-star-empty').removeClass('icon-star-empty')
-                                                                .addClass('icon-star');
-            }
-          }
-        }
-      }
-    });
-  }
+
 
   function formatMessage(d, tag, novoting) {
     var msg, userName, userFullname, i, aspect;
@@ -189,8 +121,7 @@ var msg_counter = [];
     var timeLink = '#';
     var feedURL = false;
     var profileURL = d.profile_url || '#';
-    var profileIMG = user.profile_image_url || d.profile_image_url_https || d.profile_image_url ||
-        '/extensions/WEnotes/missing.gif';
+    var profileIMG = user.profile_image_url || d.profile_image_url_https || d.profile_image_url || '';
     userName = user.screen_name || user.username || user;
     userFullname = user.name || d.from_user_name;
 
@@ -198,14 +129,14 @@ var msg_counter = [];
       case 'bookmarks':
         timeLink = 'https://bookmarks.oeru.org/bookmarks.php/' + user.username + '/' + tag;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.wikieducator.org/oeru_sscuttle.png';
+        profileIMG = '/extensions/WEnotes/images/oeru_sscuttle.png';
         // d.created_at is on UTC, not NZ time... so compensate.
         d.created_at = d.we_timestamp;
         break;
       case 'hypothesis':
         feedURL = user.feed_url;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.wikieducator.org/hypothesis.png';
+        profileIMG = '/extensions/WEnotes/images/hypothesis.png';
         timeLink = d.we_link;
         //console.log('(hypothesis) id, _id = ' + d.id + ', ' + d._id);
         //console.log('(hypothesis) tag, we_tags, we_tag = ' + tag + ', ' + d.we_tags + ', ' + d.we_tag);
@@ -213,7 +144,7 @@ var msg_counter = [];
       case 'medium':
         feedURL = user.feed_url;
         profileURL = user.profile_url;
-        profileIMG = 'https://assets.wikieducator.org/medium.png';
+        profileIMG = '/extensions/WEnotes/images/medium.png';
         timeLink = d.we_link;
         //console.log('(medium) id, _id, profileURL = ' + d.id + ', ' + d._id + ', ' + profileURL);
         break;
@@ -386,21 +317,26 @@ var msg_counter = [];
 	      break;
     }
 
+    var isDefaultAvatar = (profileIMG === '' || profileIMG.indexOf('missing.gif') !== -1 || profileIMG.indexOf('missing.jpg') !== -1);
+
     // if we don't have a profile img or url, use gravatar if available
-    if (((profileIMG === '') ||
-        (profileIMG === '/extensions/WEnotes/missing.gif')) && d.gravatar) {
-      profileIMG = 'https://www.gravatar.com/avatar/' + d.gravatar
-         + '?s=48&d=identicon';
+    if (isDefaultAvatar && d.gravatar) {
+      profileIMG = 'https://www.gravatar.com/avatar/' + d.gravatar + '?s=48&d=identicon';
+      isDefaultAvatar = false;
     }
     if ((profileURL === '') && d.gravatar) {
       profileURL = 'https://www.gravatar.com/' + d.gravatar;
+    }
+    //
+    if (isDefaultAvatar) {
+      profileIMG = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     }
     //
     // set up the actual message published in the feed for each mention
     msg = '<div id="WEitf' + d._id + '" class="WEnote">';
     msg += '<div class="WEnotepic"><a href="' +
             profileURL + '"><img ';
-    if (profileIMG === '/extensions/WEnotes/missing.gif') {
+    if (isDefaultAvatar) {
       // try to make a legal class name, after encoding, encode any
       //   underscores as well... and then replace % with _
       var encName = encodeURIComponent(userName).replace(/_/g, '%5F')
@@ -444,7 +380,7 @@ var msg_counter = [];
     }
     // include an RSS Feed Icon link if a feed is defined
     if (feedURL) {
-      feedIcon = '<img src="https://assets.wikieducator.org/rss_mini.png" alt="RSS feed URL for this person" />';
+      feedIcon = '<img src="/extensions/WEnotes/images/rss_mini.png" alt="RSS feed URL for this person" />';
       msg += '&nbsp;&nbsp;<a href="' + feedURL + '">' + feedIcon + '</a>';
     }
     msg += '<br />';
@@ -536,36 +472,21 @@ var msg_counter = [];
       '" title="' + created_date + '" style="text-decoration: none;" target="_wenotes">' +
       dt_ago + '</a>';
     if (!novoting && wgUserName) {
-      msg += '&nbsp;&nbsp;&nbsp;<i title="favorite" class="icon-star-empty"></i>';
+      var starClass = d.favorited ? 'icon-star' : 'icon-star-empty';
+      var starTitle = d.favorited ? 'unfavorite' : 'favorite';
+      msg += '&nbsp;&nbsp;&nbsp;<i title="' + starTitle + '" class="' + starClass + '"></i>';
     }
     msg += '&nbsp;<span class="wevtct"></span>';
-    // add the "sysop-only" links to view the mention in the db, or delete it
+    // add the "sysop-only" links to delete the mention
     if ($.inArray('sysop', window.wgUserGroups) > -1) {
       msg += '&nbsp;&nbsp;&nbsp;' +
-        //'<a href="' + protocol + couchHost + '_utils/document.html?' +
-        '<a href="' + protocol + couchHost + '_utils/#database/' +
-        couchDB + '/' +
-        d._id + '" target="wenotesdb">db</a>';
-      msg += '&nbsp;&nbsp;&nbsp;' +
-        '<a href="#" class="WEnd" id="WEnd_' + d._id + '_' + d._rev +
+        '<a href="#" class="WEnd" id="WEnd_' + d._id +
         '">del</a>';
     }
     msg += '</span></div><br clear="both" /></div>';
     return msg;
   }
 
-  function makeCouchqs(options) {
-    var i,
-        optionList = [];
-    //console.log("options = " + JSON.stringify(options));
-    for (i in options) {
-      if (options.hasOwnProperty(i)) {
-        optionList.push(i + '=' + encodeURIComponent(options[i]));
-      }
-    }
-    //console.log("OptionList = " + JSON.stringify(optionList.join('&')));
-    return optionList.join('&');
-  }
 
   // find the current language setting, if any. Otherwise, return en_EN...
   function getLang() {
@@ -611,282 +532,289 @@ var msg_counter = [];
     return dt.toISOString();
   }
 
-  function getDate(date, lang) {
-    var dt = new Date(date); // create date object
-    lang = (typeof lang !== 'undefined') ? lang.replace('_','-') : 'en-EN';
-    //console.log('in getDate, lang is '+lang);
-    const options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
-    return dt.toLocaleDateString(lang, options);
+  function pollForUpdates(ix) {
+    var dx = wendivs[ix];
+    if (dx.pollTimer) {
+      clearTimeout(dx.pollTimer);
+    }
+    var tag = dx.tag || 'wikieducator';
+    var taglc = tag.toLowerCase();
+    var newstylepage = (typeof site_id !== 'undefined' && typeof path_id !== 'undefined');
+    
+    var apiParams = {
+      action: 'wenotes',
+      nomode: 'get',
+      noafter: dx.last,
+      format: 'json'
+    };
+    if (tag !== '_') {
+      apiParams.notag = taglc;
+    }
+    if (newstylepage) {
+      apiParams.nopage = site_id + '-' + path_id;
+    }
+    
+    API(apiParams, function(data) {
+      try {
+        if (data && data.wenotes && data.wenotes.rows && data.wenotes.rows.length > 0) {
+          var rows = data.wenotes.rows;
+          // Prepend oldest first
+          for (var i = rows.length - 1; i >= 0; i--) {
+            var msg = rows[i].doc;
+            newPost(ix, msg);
+            if (msg.we_timestamp > dx.last) {
+              dx.last = msg.we_timestamp;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error processing WEnotes poll updates:", e);
+      } finally {
+        dx.pollTimer = setTimeout(function() { pollForUpdates(ix); }, 10000);
+      }
+    }, function() {
+      dx.pollTimer = setTimeout(function() { pollForUpdates(ix); }, 10000);
+    });
   }
 
   function getMore(event) {
-    //console.log('in getMore');
-    var options, url;
     var ix = event.data.ix,
         tag = wendivs[ix].tag,
         taglc = tag.toLowerCase(),
-        count = wendivs[ix].moreCount + 1,
+        count = wendivs[ix].moreCount,
         $wenm = $('#WEnotesMore' + ix),
         $wenmdi = $('#WEnotesMoreDiv' + ix + ' img');
+    
     $wenmdi.show();
     $wenm.hide();
-    if (tag === '_') {
-      url = couchURLall;
-      //console.log('startkey: ' + wendivs[ix].first);
-      options= {
-        startkey: '"' + wendivs[ix].first +'"',
-        endkey: '"2011-01-01T00:00:00.000Z"',
-        descending: true,
-        include_docs: true,
-        limit: count
-      };
-    } else {
-      url = couchURL;
-      options = {
-        key: '["' + taglc + '"]',
-        startkey: '["' + taglc + '", "' + wendivs[ix].first +'"]',
-        endkey: '["' + taglc + '", "2011-01-01T00:00:00.000Z"]',
-        descending: true,
-        include_docs: true,
-        limit: count
-      };
+    
+    var newstylepage = (typeof site_id !== 'undefined' && typeof path_id !== 'undefined');
+    var apiParams = {
+      action: 'wenotes',
+      nomode: 'get',
+      nobefore: wendivs[ix].first,
+      nolimit: count,
+      format: 'json'
+    };
+    if (tag !== '_') {
+      apiParams.notag = taglc;
+    }
+    if (newstylepage) {
+      apiParams.nopage = site_id + '-' + path_id;
     }
 
-    $.ajax({
-        url: url + makeCouchqs(options),
-        cache: false,
-        dataType: 'jsonp',
-        //dataType: 'json',
-        failure: function() {
-          $wenmdi.hide();
-          $wenm.show();
-        },
-        success: function(data) {
-          //console.log(JSON.stringify(data));
-          var i, d,
-              mid = '#WEnotesMoreDiv' + ix,
-              rows = data.rows;
-          // FIXME ignore first row which is a duplicate of current "first"
-          //  to avoid having to calculate first - 0.001
-          // check if we are at the end of the database
-          if (rows.length <= 1) {
-            $(mid).hide();
-            return;
-          }
-          var lang = getLang();
-          console.log('in CouchReturn, got lang '+lang);
-          for (i=1; i < rows.length; i++) {
-            d = rows[i].doc;
-            if (d.we_timestamp > wendivs[ix].last) {
-              wendivs[ix].last = d.we_timestamp;
-            }
-            if (d.we_timestamp < wendivs[ix].first) {
-              wendivs[ix].first = d.we_timestamp;
-            }
-            $(mid).before(formatMessage(d, tag));
-            $('#WEitf'+d._id).find('time.timeago').timeago();
-            //$(lid).effect("highlight", {}, 1500);
-          }
-          $wenmdi.hide();
-          $wenm.show();
-          wendivs[ix].moreCount += 20;
+    API(apiParams, function(data) {
+      if (!data || !data.wenotes || !data.wenotes.rows) {
+        return;
+      }
+      var i, d,
+          mid = '#WEnotesMoreDiv' + ix,
+          rows = data.wenotes.rows;
+          
+      if (rows.length === 0) {
+        $(mid).hide();
+        return;
+      }
+      
+      var lang = getLang();
+      console.log('in return from getMore, got lang ' + lang);
+      for (i = 0; i < rows.length; i++) {
+        d = rows[i].doc;
+        if (d.we_timestamp > wendivs[ix].last) {
+          wendivs[ix].last = d.we_timestamp;
         }
+        if (d.we_timestamp < wendivs[ix].first) {
+          wendivs[ix].first = d.we_timestamp;
+        }
+        $(mid).before(formatMessage(d, tag));
+        $('#WEitf' + d._id).find('time.timeago').timeago();
+      }
+      
+      $wenmdi.hide();
+      $wenm.show();
+      
+      if (rows.length < count) {
+        $(mid).hide();
+      }
+    }, function() {
+      $wenmdi.hide();
+      $wenm.show();
     });
     return false;
   }
 
   function WEnotes(ix) {
-    var url, options, ids=[];
     var dx = wendivs[ix];
     var tag = dx.tag || 'wikieducator';
     var newstylepage = false;
     var taglc = tag.toLowerCase();
     var count = dx.count || 20;
-    // exploits knowing the milliseconds of all we_timestamp = .000i
-    var lastplus = dx.last.slice(0, -2) + '1Z';
+    
     if (dx.timer) {
       clearTimeout(dx.timer);
     }
-    var refreshtime = 30000;
-
-    // if both site_id and path_id are defined in the current scope, we've got
-    // a new-style page
+    
     if (typeof site_id !== 'undefined' && typeof path_id !== 'undefined' ) {
         newstylepage = true;
     }
 
-    if (tag === '_') {
-      url = couchURLall;
-      options = {
-        endkey: '"' + lastplus + '"',
-        descending: true,
-        include_docs: true,
-        limit: count
-      };
-    } else if (newstylepage) {
-      console.log("!!! we're looking at a new style page!");
-      url = couchURLpath;
-      page = site_id + '-' + path_id;
-      options = {
-        key: '["' + page + '"]',
-        startkey: '["' + page + '",{}]',
-        endkey: '["' + page + '", "' + lastplus + '"]',
-        descending: true,
-        include_docs: true,
-        limit: count
-      };
-    } else {
-      url = couchURL;
-      options = {
-        key: '["' + taglc + '"]',
-        startkey: '["' + taglc + '",{}]',
-        endkey: '["' + taglc + '", "' + lastplus + '"]',
-        descending: true,
-        include_docs: true,
-        limit: count
-      };
+    var apiParams = {
+      action: 'wenotes',
+      nomode: 'get',
+      nolimit: count,
+      format: 'json'
+    };
+    if (tag !== '_') {
+      apiParams.notag = taglc;
     }
-    $.ajax({
-        url: url + makeCouchqs(options),
-        cache: false,
-        dataType: 'jsonp',
-        //dataType: 'json',
-        failure: function() {
-          // hope things are better later
-          dx.timer = setTimeout(function() {$('div.WEnotes:first')
-                      .triggerHandler('WEnotes', [dx.tag]);}, refreshtime);
-        },
-        success: function(data) {
-          //console.log("data = " + JSON.stringify(data));
-          //console.log('current setting for wenlang '+ wenlang);
-          var i;
-          var lid = '.WEnotes';
-          var rows = data.rows;
+    if (newstylepage) {
+      apiParams.nopage = site_id + '-' + path_id;
+    }
 
-          if (!dx.nospinner) {
-            wendivs[ix].nospinner = true;
-            dx.$d.find('.WEnotesSpinner').before('<div id="WEnote0_' + ix + '"></div>');
-            dx.$d.find('.WEnotesSpinner').remove();
-            lid = '#WEnote0_' + ix;
-          }
-          if (!dx.nomore && (data.total_rows - data.offset > rows.length)) {
-            wendivs[ix].nomore = true;
-            //console.log('language for wendivs '+ix+' is ', data.language);
-            if (getLang() == 'fr_FR') {
-              button_text = "Plus d’actualités " + tag;
-              if (tag === '_') {
-                button_text = "Plus d’actualités";
-              }
-	            //console.log('chose fr_FR: '+button_text);
-            } else {
-              button_text = "More " + tag + " notes";
-              if (tag === '_') {
-                button_text = "More notes";
-	            }
-	            //console.log('chose not-fr_FR: '+button_text);
-      	    }
-            $(lid).after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
-              ix +'"><img src="' + protocol + 'wikieducator.org/skins/common/images/ajax-loader.gif" />' +
-              '<input id="WEnotesMore' + ix +
-              '" type="submit" value="' + button_text + '" />' +
-              '</div><br clear="all" />');
-            $('#WEnotesMore' + ix).bind('click', { ix: ix }, getMore);
-          }
-          for (i=0; i<rows.length; i++) {
-            var d = rows[i].doc;
-            if (typeof msg_counter[d.id] === 'undefined') {
-               msg_counter[d.id] = 0;
+    API(apiParams, function(data) {
+      if (!data || !data.wenotes || !data.wenotes.rows) {
+        return;
+      }
+      var i;
+      var lid = '#WEnote0_' + ix;
+      var rows = data.wenotes.rows;
+
+      if (!dx.nospinner) {
+        wendivs[ix].nospinner = true;
+        dx.$d.find('.WEnotesSpinner').before('<div id="WEnote0_' + ix + '"></div>');
+        dx.$d.find('.WEnotesSpinner').remove();
+      }
+      
+      if (!dx.nomore && (data.wenotes.total_rows - data.wenotes.offset > rows.length)) {
+        if ($('#WEnotesMoreDiv' + ix).length === 0) {
+          var button_text;
+          if (getLang() === 'fr_FR') {
+            button_text = "Plus d’actualités " + tag;
+            if (tag === '_') {
+              button_text = "Plus d’actualités";
             }
-            msg_counter[d.id] = msg_counter[d.id] + 1;
-            //console.log('looking at id = ' + d.id + ' counter = ' + msg_counter[d.id]);
-            // we've seen this message before, don't show it again!
-            if (msg_counter[d.id] > 1) {
-              //console.log('whoa! Something funny going on with ' + d.id);
-              continue;
+          } else {
+            button_text = "More " + tag + " notes";
+            if (tag === '_') {
+              button_text = "More notes";
             }
-            if (d.we_timestamp > wendivs[ix].last) {
-              wendivs[ix].last = d.we_timestamp;
-            }
-            if (d.we_timestamp < wendivs[ix].first) {
-              wendivs[ix].first = d.we_timestamp;
-            }
-            $(lid).after(formatMessage(d, tag));
-            lid = '#WEitf' + d._id;
-            $(lid).find('time.timeago').timeago();
-            ids.push(d._id);
           }
-          //console.log('ids = ' + JSON.stringify(ids));
-          /* to stay at fixed length
-          while ($(did + ' > div').length > count) {
-            $(did + ' > div:last').remove();
-          }
-          */
-          getFaves(tag);
+          var $lastNote = dx.$d.find('.WEnote:last');
+          var $insertAfter = $lastNote.length ? $lastNote : $(lid);
+          $insertAfter.after('<div class="WEnotesMore" id="WEnotesMoreDiv' +
+            ix +'"><img src="/skins/common/images/ajax-loader.gif" />' +
+            '<input id="WEnotesMore' + ix +
+            '" type="submit" value="' + button_text + '" />' +
+            '</div><br clear="all" />');
+          $('#WEnotesMore' + ix).bind('click', { ix: ix }, getMore);
         }
+      }
+      
+      var ids = [];
+      for (i=0; i<rows.length; i++) {
+        var d = rows[i].doc;
+        if (typeof msg_counter[d.id] === 'undefined') {
+           msg_counter[d.id] = 0;
+        }
+        msg_counter[d.id] = msg_counter[d.id] + 1;
+        if (msg_counter[d.id] > 1) {
+          continue;
+        }
+        if (d.we_timestamp > wendivs[ix].last) {
+          wendivs[ix].last = d.we_timestamp;
+        }
+        if (d.we_timestamp < wendivs[ix].first) {
+          wendivs[ix].first = d.we_timestamp;
+        }
+        $(lid).after(formatMessage(d, tag));
+        lid = '#WEitf' + d._id;
+        $(lid).find('time.timeago').timeago();
+        ids.push(d._id);
+      }
+      
+      if (dx.pollTimer) {
+        clearTimeout(dx.pollTimer);
+      }
+      dx.pollTimer = setTimeout(function() { pollForUpdates(ix); }, 10000);
+    }, function() {
+      dx.timer = setTimeout(function() {
+        $('div.WEnotes:first').triggerHandler('WEnotes', [dx.tag]);
+      }, 30000);
     });
   }
 
-  // display list of ids in specified div
-  //  ids can be an array or a string with comma separator
   function WEnotesList(div, ids) {
     if (typeof ids === 'string') {
       ids = ids.split(',');
     }
+    if (!ids || ids.length === 0) return;
+    
     $.ajax({
-      url: couchHost + couchDB + '/_all_docs?include_docs=true&keys=' + encodeURIComponent(JSON.stringify(ids)),
-      cache: false,
-      dataType: 'jsonp',
-      //dataType: 'json',
-      success: function(d) {
-        var i, rowsl = d.rows.length;
-        for (i=0; i<rowsl; i++) {
-          $(div).append(formatMessage(d.rows[i].doc, '_', true));
-        }
-      }
-    });
-  }
-
-  // display most popular WEnotes for given tag in specified div
-  function WEnotesTop(div, tag, cnt) {
-    tag = tag.toLowerCase();
-    $.ajax({
-      url: couchHost + 'votes/_design/vote/_view/totals?group=true&startkey=' + encodeURIComponent(JSON.stringify(['WN' + tag])) + '&endkey=' + encodeURIComponent(JSON.stringify(['WN'+tag, {}])),
-      cache: false,
-      dataType: 'jsonp',
-      //dataType: 'json',
-      success: function(d) {
-        //console.log('in WEnotesTop!');
-        var i, rowsl = d.rows.length,
-            items = [], ids = [];
-        for (i=0; i<rowsl; i++) {
-          if (d.rows[i].value > 0) {
-            items.push([d.rows[i].value, d.rows[i].key[1]])
+      url: window.wgServer + weAPI,
+      type: 'POST',
+      data: {
+        action: 'wenotes',
+        nomode: 'get',
+        noids: ids.join(','),
+        format: 'json'
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data && data.wenotes && data.wenotes.rows) {
+          var rows = data.wenotes.rows;
+          for (var i = 0; i < rows.length; i++) {
+            $(div).append(formatMessage(rows[i].doc, '_', true));
           }
         }
-        items.sort(function(a, b) {a = a[0]; b = b[0]; return a < b ? -1 : (a > b ? 1 : 0); });
-        for (i=0; (i<items.length) && (i<cnt); i++) {
-          ids.push(items[i][1]);
-        }
-        WEnotesList(div, ids);
       }
     });
   }
 
-  // FIXME: describe what this method really does...
-  function newPost(i, message) {
-    //console.log('in newPost');
-    // ignore design updates
+  function WEnotesTop(div, tag, cnt) {
+    var taglc = tag.toLowerCase();
+    $.ajax({
+      url: window.wgServer + weAPI,
+      type: 'POST',
+      data: {
+        action: 'wevotes',
+        vopid: 'WN' + taglc,
+        vomode: 'get',
+        format: 'json'
+      },
+      dataType: 'json',
+      success: function(data) {
+        if (data && data.wevotes && data.wevotes.totals) {
+          var totals = data.wevotes.totals;
+          var unsorted = [];
+          for (var vid in totals) {
+            if (totals[vid] > 0) {
+              unsorted.push([totals[vid], vid]);
+            }
+          }
+          unsorted.sort(function(a, b) {
+            return b[0] - a[0];
+          });
+          var sorted = [];
+          for (var i = 0; i < unsorted.length && i < cnt; i++) {
+            sorted.push(unsorted[i][1]);
+          }
+          WEnotesList(div, sorted);
+        }
+      }
+    });
+  }
+
+  function newPost(ix, message) {
     if (message._id.charAt(0) === '_') {
       return;
     }
-    // FIXME keep a local cache of IDs rather than querying DOM?
     if ($('#WEitf' + message._id).length === 0) {
-      if (!message.we_d) {   // don't show new deletions
-        var wd = wendivs[i-1];
+      if (!message.we_d) {
+        var wd = wendivs[ix];
         wd.$d.prepend(formatMessage(message, wd.tag));
         $('#WEitf'+ message._id).find('time.timeago').timeago();
       }
-    } else { // we've seen this message, is it going away?
+    } else {
       if (message.we_d) {
         $('#WEitf' + message._id).hide('fast');
       }
@@ -895,8 +823,7 @@ var msg_counter = [];
 
   function WEnotesHandler(event, tag) {
     $.each(wendivs, function (i, v) {
-      //debug.log('iterating through wendivs', i, v);
-      if (tag && v.tag !== tag) {
+      if (tag && v.tag && v.tag.toLowerCase() !== tag.toLowerCase()) {
         return;
       }
       WEnotes(i);
@@ -918,66 +845,38 @@ var msg_counter = [];
   //console.log('starting WEnotes...');
 
   var msie = msieVersion();
-  $('head').append('<link href="https://assets.wikieducator.org/css/font-awesome.min.css" rel="stylesheet" />');
+  $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome.min.css" rel="stylesheet" />');
   if (msie === 7) {
-    $('head').append('<link href="https://assets.wikieducator.org/css/font-awesome-ie7.min.css" rel="stylesheet" />');
+    $('head').append('<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/3.1.0/css/font-awesome-ie7.min.css" rel="stylesheet" />');
   }
-  $('head').append('<link href="https://wikieducator.org/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
-  // only create one Faye client per page
-  if (!window.WEFclient) {
-    window.WEFclient = new Faye.Client(protocol + fayeURL, {
-      timeout: 120
-    });
-    if (msie <= 8) {
-      window.WEFclient.disable('autodisconnect');
-    }
-  }
-  // rename this for brevity
-  var client = window.WEFclient;
-  // to hold individual subscriptions
-  var subs = [];
-  // for each WEnotes instance on the page
-  //console.log("==== looking for WEnotes class...");
+  $('head').append('<link href="/extensions/WEnotes/WEnotes.css" rel="stylesheet" />');
+
   $('div.WEnotes').each(function() {
     var $thisd = $(this);
-    // get the other classes alongside WEnotes, e.g. WEnotes-20-lida101-lida-fr_FR
     var classes = $(this).attr('class').split(/\s+/);
-    // for each class, get useful info out of the class name
-    // in the example above, 20 is the 'count' of messages to show,
-    // and lida101 is the tag, lida is the 'context', and fr_FR is the language
     $.each(classes, function(i, v) {
-      //console.log('==== v = ', v);
       if (v.indexOf('WEnotes-') === 0) {
         var tag;
         var args = v.split('-', 5);
         if (args.length > 2) {
           tag = args[2];
-          // add each class' details to a list for future reference
           wendivs.push({
             $d: $thisd,
-            count: args[1], // how many of this to show
-            tag: tag, // from which tag
-	          context: args[3],
+            count: args[1],
+            tag: tag,
+            context: args[3],
             language: args[4],
             last: '2011-01-01T00:00:00.000Z',
             first: '2999-12-31T23:59:59.999Z',
-            moreCount: 20  // how many more to show if the user clicks "show more"
+            moreCount: 20
           });
 
- 	        wenlang = args[4];
-	        //console.log('wenlang for WEnote: '+wenlang);
-          // actually subscribe to the Faye services for the relevant combo
-          combo = '/WEnotes/' + ((tag === '_') ? '*' : tag.toLowerCase());
-          //console.log('combo = ', combo);
-          subs[i] = client.subscribe(combo, function(msg) {
-            //console.log('i = ', i);
-            //console.log('msg = ', msg);
-            newPost(i, msg);
-          });
+          wenlang = args[4];
         }
       }
     });
   });
+  
   $('div.WEnotes,div.WEnotesList').on('click', '.icon-star, .icon-star-empty', like)
               .on('click', '.icon-mail-reply, .icon-th-list', windowConv)
               .on('click', 'a.WEnd', function() {
@@ -993,6 +892,7 @@ var msg_counter = [];
       },
       success: function() {
         console.log('deleting mention designated by ' + id);
+        $('#WEitf' + id).hide('fast');
       },
       failure: function() {
         alert('unable to delete');
@@ -1000,12 +900,77 @@ var msg_counter = [];
       });
     return false;   // we got this
   });
+  
   $('div.WEnotes').on('WEnotes', WEnotesHandler);
+  
   if (wendivs.length) {
     console.log('wendivs has length '+wendivs.length);
     $('div.WEnotes:first').triggerHandler('WEnotes');
   }
+  
+  // find the current language setting, if any. Otherwise, return en_EN...
+  function getLang() {
+    //console.log('in getLang');
+    var wenlang = 'en_NZ';
+    $('div.WEnotes').each(function() {
+      var $details = $(this).attr('class').split(/\s+/);
+      $.each($details, function(i, v) {
+        if (v.indexOf('WEnotes-') === 0) {
+          //console.log('+++++ v = ', v);
+          var args = v.split('-');
+          //console.log('+++++ args = '+JSON.stringify(args));
+          if (args.length > 3) {
+ 	          wenlang = (args[4] !== '') ? args[4] : 'en_NZ';
+            //console.log('found lang = '+wenlang);
+            if (wenlang == 'fr_FR') {
+              $.extend($.timeago.settings.strings = {
+                   // environ ~= about, it's optional
+                   prefixAgo: "il y a",
+                   prefixFromNow: "d'ici",
+                   seconds: "moins d'une minute",
+                   minute: "environ une minute",
+                   minutes: "environ %d minutes",
+                   hour: "environ une heure",
+                   hours: "environ %d heures",
+                   day: "environ un jour",
+                   days: "environ %d jours",
+                   month: "environ un mois",
+                   months: "environ %d mois",
+                   year: "un an",
+                   years: "%d ans"
+              });
+            }
+          }
+        }
+      });
+    });
+    return wenlang;
+  }
+
+  function getISODate(date) {
+    try {
+      var dt = new Date(date);
+      if (!isNaN(dt.getTime())) {
+        return dt.toISOString();
+      }
+    } catch (e) {}
+    return new Date().toISOString();
+  }
+
+  function getDate(date, lang) {
+    try {
+      var dt = new Date(date);
+      if (!isNaN(dt.getTime())) {
+        lang = (typeof lang !== 'undefined') ? lang.replace('_','-') : 'en-US';
+        var options = {weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'};
+        return dt.toLocaleDateString(lang, options);
+      }
+    } catch (e) {}
+    return date || '';
+  }
+
   window.WEnotes.formatMessage = formatMessage;
   window.WEnotes.list = WEnotesList;
   window.WEnotes.top = WEnotesTop;
 }());
+

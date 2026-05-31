@@ -81,6 +81,8 @@ function WEnotesPostWP(id, tag, button, leftmargin, language) {
               msg = msg + ":\n" + d.error.info;
             }
             alert(msg);
+          } else {
+            $('div.WEnotes').trigger('WEnotes', [tag]);
           }
           $button.removeAttr('disabled');
           $text.val('');
